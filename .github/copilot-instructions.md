@@ -1,7 +1,8 @@
 # GitHub Copilot Instructions - Starfinder 2E Job Board
 
 ## Project Overview
-This is an LLM-powered job board for TTRPGs. GMs can manage campaigns and generate AI-powered job postings, while players can view and vote on missions via shared links.
+This is an LLM-powered job board for TTRPGs, with the MVP being focused on Starfinder 2E. GMs can manage campaigns and generate AI-powered job postings, while players can view and vote on missions via shared links.
+
 
 ## Technology Stack
 
@@ -10,40 +11,38 @@ This is an LLM-powered job board for TTRPGs. GMs can manage campaigns and genera
 - **React**: 19.x (latest stable)
 - **TypeScript**: 5.x (latest stable)
 - **Node.js**: 20.x LTS or higher
+- **Tailwind CSS**: 4.x (latest stable)
+- **shadcn/ui**: Latest version for pre-built components
 
-### Frontend Dependencies
-```json
-{
-  "dependencies": {
-    "react": "19.2.0",
-    "react-dom": "19.2.0",
-    "next": "16.0.1"
-  },
-  "devDependencies": {
-    "typescript": "^5",
-    "@types/node": "^20",
-    "@types/react": "^19",
-    "@types/react-dom": "^19",
-    "@tailwindcss/postcss": "^4",
-    "tailwindcss": "^4",
-    "eslint": "^9",
-    "eslint-config-next": "16.0.1"
-  }
-}
-```
 
-### Backend/API Dependencies
-```json
-{
-  "dependencies": {}
-}
-```
+### Database & Backend
+- **Supabase**: PostgreSQL-based backend with Auth, Realtime, and Storage
+- **Supabase CLI**: For managing database schema and migrations
 
-### Optional UI Component Library
-Consider using one of these for faster UI development:
-- **shadcn/ui**: Tailwind-based components (copy/paste, no dependency)
-- **Radix UI**: Headless components for accessibility
-- **Headless UI**: Tailwind Labs' component library
+### Testing: Jest
+
+**Testing Guidelines:**
+- Write comprehensive unit tests for all business logic
+- Follow the AAA pattern: Arrange, Act, Assert
+- Maintain good test coverage (aim for 80%+ for critical paths)
+- Write descriptive test names that explain the expected behavior
+- Use test doubles (mocks, stubs, spies) appropriately
+- Implement integration tests for API endpoints and user flows
+- Keep tests fast, isolated, and deterministic
+
+## AI Code Generation Preferences
+
+When generating code, please:
+
+- Generate complete, working code examples with proper imports
+- Include inline comments for complex logic and business rules
+- Follow the established patterns and conventions in this project
+- Suggest improvements and alternative approaches when relevant
+- Consider performance, security, and maintainability
+- Include error handling and edge case considerations
+- Generate appropriate unit tests when creating new functions
+- Follow accessibility best practices for UI components
+- Use semantic HTML and proper ARIA attributes when applicable
 
 ## Project Structure
 
@@ -269,7 +268,7 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 
 ## Phase 1 MVP Checklist
 
-- [ ] Next.js project setup with TypeScript and Tailwind
+- [x] Next.js project setup with TypeScript and Tailwind
 - [ ] Supabase project created and schema defined
 - [ ] Authentication implemented (Supabase Auth)
 - [ ] GM dashboard with campaign CRUD

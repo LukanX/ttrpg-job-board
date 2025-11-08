@@ -1,0 +1,212 @@
+[
+  {
+    "index": 0,
+    "ok": true,
+    "elapsed": 6965,
+    "provider": "openai_node",
+    "raw": {
+      "id": "chatcmpl-CZdpuAz4CvvM2WCxYYxtPGzYDpC1E",
+      "object": "chat.completion",
+      "created": 1762610646,
+      "model": "gpt-4o-mini-2024-07-18",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "```json\n{\n  \"id\": \"job-001\",\n  \"title\": \"The Lost Artifact\",\n  \"hook\": \"A mysterious artifact has been uncovered in the ruins of an ancient civilization, but others seek it for their own nefarious purposes.\",\n  \"difficulty\": 7,\n  \"reward\": \"500 credits and a rare item\",\n  \"gm_notes\": \"The artifact is cursed; players may experience strange phenomena.\",\n  \"encounters\": [\n    {\n      \"type\": \"combat\",\n      \"description\": \"Bandits ambush the party while they explore the ruins.\"\n    },\n    {\n      \"type\": \"puzzle\",\n      \"description\": \"A series of ancient mechanisms must be solved to access the artifact.\"\n    }\n  ],\n  \"npcs\": [\n    {\n      \"name\": \"Zara Voss\",\n      \"role\": \"Artifact Hunter\",\n      \"alignment\": \"Neutral\",\n      \"description\": \"A cunning treasure seeker with a hidden agenda.\"\n    },\n    {\n      \"name\": \"Eldrin the Wise\",\n      \"role\": \"Ancient Scholar\",\n      \"alignment\": \"Lawful Good\",\n      \"description\": \"An elderly scholar who knows the history of the artifact.\"\n    }\n  ]\n}\n```",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 257,
+        "total_tokens": 317,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "service_tier": "default",
+      "system_fingerprint": "fp_560af6e559"
+    }
+  },
+  {
+    "index": 1,
+    "ok": true,
+    "elapsed": 8044,
+    "provider": "openai_node",
+    "raw": {
+      "id": "chatcmpl-CZdq1V0UMFgmkVOJiwWTM4OqmHzxS",
+      "object": "chat.completion",
+      "created": 1762610653,
+      "model": "gpt-4o-mini-2024-07-18",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "```json\n{\n  \"id\": \"job001\",\n  \"title\": \"The Lost Artifact\",\n  \"hook\": \"A mysterious artifact has resurfaced, drawing the attention of multiple factions. Can you retrieve it before it falls into the wrong hands?\",\n  \"difficulty\": 7,\n  \"reward\": \"3,000 credits and a rare technological upgrade\",\n  \"gm_notes\": \"The artifact is cursed; players may experience strange phenomena while in possession of it.\",\n  \"encounters\": [\n    {\n      \"type\": \"combat\",\n      \"description\": \"Ambushed by mercenaries hired by a rival faction.\"\n    },\n    {\n      \"type\": \"social\",\n      \"description\": \"Negotiate with a local informant who knows the artifact's whereabouts.\"\n    },\n    {\n      \"type\": \"exploration\",\n      \"description\": \"Navigate a treacherous ancient ruin to find the artifact.\"\n    }\n  ],\n  \"npcs\": [\n    {\n      \"name\": \"Zara Vex\",\n      \"role\": \"Rival Faction Leader\",\n      \"description\": \"A cunning and ruthless leader willing to do anything to obtain the artifact.\"\n    },\n    {\n      \"name\": \"Eldrin the Wise\",\n      \"role\": \"Informant\",\n      \"description\": \"An old scholar with knowledge of the artifact's history.\"\n    },\n    {\n      \"name\": \"Kara\",\n      \"role\": \"Mercenary\",\n      \"description\": \"A skilled fighter hired to protect the artifact for her employer.\"\n    }\n  ]\n}\n```",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 321,
+        "total_tokens": 381,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "service_tier": "default",
+      "system_fingerprint": "fp_560af6e559"
+    }
+  },
+  {
+    "index": 2,
+    "ok": true,
+    "elapsed": 7309,
+    "provider": "openai_node",
+    "raw": {
+      "id": "chatcmpl-CZdq9n6e3svn9wfVS9ipQGxOvAa3B",
+      "object": "chat.completion",
+      "created": 1762610661,
+      "model": "gpt-4o-mini-2024-07-18",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "```json\n{\n  \"id\": \"job001\",\n  \"title\": \"The Lost Shipment\",\n  \"hook\": \"A mysterious shipment has gone missing en route to the capital planet, and you’ve been hired to uncover the truth.\",\n  \"difficulty\": 5,\n  \"reward\": \"500 credits and a rare data module\",\n  \"gm_notes\": \"The shipment was stolen by a rival faction. Use this to create tension.\",\n  \"encounters\": [\n    {\n      \"type\": \"combat\",\n      \"description\": \"Ambush by rival faction members in a derelict space station.\"\n    },\n    {\n      \"type\": \"social\",\n      \"description\": \"Negotiation with a shady informant who knows about the shipment's whereabouts.\"\n    }\n  ],\n  \"npcs\": [\n    {\n      \"name\": \"Zara Voss\",\n      \"role\": \"Informant\",\n      \"traits\": [\"shady\", \"well-informed\"]\n    },\n    {\n      \"name\": \"Captain Ralnox\",\n      \"role\": \"Rival Faction Leader\",\n      \"traits\": [\"charismatic\", \"ruthless\"]\n    }\n  ]\n}\n```",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 242,
+        "total_tokens": 302,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "service_tier": "default",
+      "system_fingerprint": "fp_560af6e559"
+    }
+  },
+  {
+    "index": 3,
+    "ok": true,
+    "elapsed": 8206,
+    "provider": "openai_node",
+    "raw": {
+      "id": "chatcmpl-CZdqHVdaB1UDOlm5r03P1OrmRQa7R",
+      "object": "chat.completion",
+      "created": 1762610669,
+      "model": "gpt-4o-mini-2024-07-18",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "```json\n{\n  \"id\": \"job_001\",\n  \"title\": \"The Stolen Starship\",\n  \"hook\": \"A renowned captain's starship has been stolen, and the crew needs your help to retrieve it before it's dismantled for parts.\",\n  \"difficulty\": 7,\n  \"reward\": \"5000 credits and a rare starship component\",\n  \"gm_notes\": \"The captain has a hidden agenda related to their past.\",\n  \"encounters\": [\n    {\n      \"type\": \"space battle\",\n      \"description\": \"Confront the thieves in an asteroid field.\"\n    },\n    {\n      \"type\": \"negotiation\",\n      \"description\": \"Bargain with a black market dealer for information.\"\n    },\n    {\n      \"type\": \"infiltration\",\n      \"description\": \"Sneak into the thieves' hideout to recover the ship.\"\n    }\n  ],\n  \"npcs\": [\n    {\n      \"name\": \"Captain Rhea\",\n      \"role\": \"quest giver\",\n      \"description\": \"A charismatic starship captain with a mysterious past.\"\n    },\n    {\n      \"name\": \"Zarok the Broker\",\n      \"role\": \"information source\",\n      \"description\": \"A shifty black market dealer with ties to the underworld.\"\n    },\n    {\n      \"name\": \"Thorn\",\n      \"role\": \"thief leader\",\n      \"description\": \"A cunning and ruthless leader of the ship thieves.\"\n    }\n  ]\n}\n```",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 311,
+        "total_tokens": 371,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "service_tier": "default",
+      "system_fingerprint": "fp_560af6e559"
+    }
+  },
+  {
+    "index": 4,
+    "ok": true,
+    "elapsed": 5831,
+    "provider": "openai_node",
+    "raw": {
+      "id": "chatcmpl-CZdqPumC413vXj8BF2XLBW8ec0Fm4",
+      "object": "chat.completion",
+      "created": 1762610677,
+      "model": "gpt-4o-mini-2024-07-18",
+      "choices": [
+        {
+          "index": 0,
+          "message": {
+            "role": "assistant",
+            "content": "```json\n{\n  \"id\": \"job_001\",\n  \"title\": \"Lost Cargo Retrieval\",\n  \"hook\": \"A distressed merchant seeks brave souls to recover his lost cargo from a derelict space station.\",\n  \"difficulty\": 5,\n  \"reward\": \"1000 credits and a choice of one rare item from the cargo.\",\n  \"gm_notes\": \"The cargo is guarded by a rogue AI and a pack of space pirates.\",\n  \"encounters\": [\n    \"Rogue AI defense system\",\n    \"Space pirate ambush\",\n    \"Environmental hazards in the station\"\n  ],\n  \"npcs\": [\n    {\n      \"name\": \"Kara Voss\",\n      \"role\": \"Merchant\",\n      \"description\": \"A desperate but resourceful merchant willing to pay handsomely for the return of his goods.\"\n    },\n    {\n      \"name\": \"Zyra the Cunning\",\n      \"role\": \"Space Pirate Leader\",\n      \"description\": \"A cunning and ruthless leader of a band of pirates, known for her tactical prowess.\"\n    }\n  ]\n}\n```",
+            "refusal": null,
+            "annotations": []
+          },
+          "logprobs": null,
+          "finish_reason": "stop"
+        }
+      ],
+      "usage": {
+        "prompt_tokens": 60,
+        "completion_tokens": 226,
+        "total_tokens": 286,
+        "prompt_tokens_details": {
+          "cached_tokens": 0,
+          "audio_tokens": 0
+        },
+        "completion_tokens_details": {
+          "reasoning_tokens": 0,
+          "audio_tokens": 0,
+          "accepted_prediction_tokens": 0,
+          "rejected_prediction_tokens": 0
+        }
+      },
+      "service_tier": "default",
+      "system_fingerprint": "fp_560af6e559"
+    }
+  }
+]
