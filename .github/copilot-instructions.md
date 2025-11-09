@@ -3,6 +3,15 @@
 ## Project Overview
 This is an LLM-powered job board for TTRPGs, with the MVP being focused on Starfinder 2E. GMs can manage campaigns and generate AI-powered job postings, while players can view and vote on missions via shared links.
 
+## Task Planning and Problem Solving
+
+- Before each task, you must first complete the following steps:
+  1. Provide a full plan of your changes.
+  2. Provide a list of behaviors that you'll change.
+  3. Provide a list of test cases to add.
+- Before you add any code, always check if you can just re-use
+  or re-configure any existing code to achieve the result.
+
 
 ## Technology Stack
 
