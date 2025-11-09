@@ -40,8 +40,9 @@ export async function generateJobGemini(
     }],
     generationConfig: {
       temperature: options.temperature ?? 0.7,
-      // Allow overriding via options or env var; default to 1500 for fuller outputs
-      maxOutputTokens: options.maxTokens ?? Number(process.env.GOOGLE_GEMINI_MAX_TOKENS ?? '1500'),
+      // Allow overriding via options or env var; default to 2000 for fuller outputs
+      maxOutputTokens: options.maxTokens ?? Number(process.env.GOOGLE_GEMINI_MAX_TOKENS ?? '2000'),
+      responseMimeType: 'application/json',
     }
   }
 

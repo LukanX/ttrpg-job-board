@@ -86,7 +86,8 @@ export async function generateJobOpenAI(
       model,
       messages: [{ role: 'user', content: prompt }],
       temperature: options.temperature ?? 0.7,
-      max_tokens: options.maxTokens ?? Number(process.env.OPENAI_MAX_TOKENS ?? '512'),
+      max_tokens: options.maxTokens ?? Number(process.env.OPENAI_MAX_TOKENS ?? '2000'),
+      response_format: { type: 'json_object' },
     })
 
     // Response parsing: attempt to be robust across client versions

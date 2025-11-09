@@ -1,0 +1,101 @@
+import { createClient } from '@/lib/supabase/server'
+import { redirect, notFound } from 'next/navigation'
+import Link from 'next/link'
+import type { Campaign, Organization, MissionType, Job } from '@/types/database'
+import CampaignTabs from './CampaignTabs'
+
+interface PageProps {
+  params: Promise<{ id: string }>
+}
+
+export default async function CampaignPage({ params }: PageProps) {
+  const { id } = await params
+  const supabase = await createClient()
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
+
+  if (!user) {
+    redirect('/login')
+  }
+
+  // Fetch campaign
+  const { data: campaign, error: campaignError } = await supabase
+    .from('campaigns')
+    .select('*')
+    .eq('id', id)
+    .eq('gm_id', user.id)
+    .single()
+
+  if (campaignError || !campaign) {
+    notFound()
+  }
+
+  // Fetch related data
+  const { data: organizations } = await supabase
+    .from('organizations')
+    .select('*')
+    .eq('campaign_id', id)
+    .order('name')
+
+  const { data: missionTypes } = await supabase
+    .from('mission_types')
+    .select('*')
+    .eq('campaign_id', id)
+    .order('name')
+
+  const { data: jobs } = await supabase
+    .from('jobs')
+    .select('*')
+    .eq('campaign_id', id)
+    .order('created_at', { ascending: false })
+
+  return (
+    <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
+      <div className="px-4 py-6 sm:px-0">
+        {/* Header */}
+        <div className="mb-6">
+          <Link
+            href="/gm/dashboard"
+            className="text-sm text-gray-600 hover:text-gray-900 mb-2 inline-block"
+          >
+            ← Back to Campaigns
+          </Link>
+          <div className="flex justify-between items-start">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">
+                {campaign.name}
+              </h1>
+              <p className="text-sm text-gray-600 mt-1">
+                Party Level: {campaign.party_level}
+              </p>
+            </div>
+            <div className="text-right">
+              <p className="text-sm text-gray-600">Share Code</p>
+              <p className="font-mono text-lg font-semibold text-blue-600">
+                {campaign.share_code}
+              </p>
+              <a
+                href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/share/${campaign.share_code}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-blue-600 hover:text-blue-800"
+              >
+                View player page →
+              </a>
+            </div>
+          </div>
+        </div>
+
+        {/* Tabs */}
+        <CampaignTabs
+          campaignId={id}
+          organizations={organizations || []}
+          missionTypes={missionTypes || []}
+          jobs={jobs || []}
+        />
+      </div>
+    </div>
+  )
+}
