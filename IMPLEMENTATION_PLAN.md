@@ -3,269 +3,284 @@
 ## Project Overview
 A web application that generates TTRPG job postings using AI, allowing GMs to manage campaigns and players to view/vote on missions.
 
----
-
-## Technology Stack Recommendations
-
-### Frontend
-- **Framework**: Next.js 16+ (App Router)
-- **UI Library**: React 19+
-- **Styling**: Tailwind CSS
-- **State Management**: React Context API + useState/useReducer (keep it simple initially)
-- **Forms**: React Hook Form + Zod for validation
-
-### Backend
-- **API**: Next.js API Routes (serverless functions)
-- **Database**: 
-  - **Primary Choice**: Supabase (PostgreSQL)
-    - Free tier: 500MB database, 1GB file storage
-    - Built-in authentication
-    - Real-time subscriptions (for voting updates)
-    - Row Level Security (RLS) for data protection
-  - **Alternative**: PlanetScale (MySQL) or Neon (PostgreSQL)
-
-### LLM Integration
-- **Primary Choice**: OpenAI API (GPT-4 or GPT-3.5-turbo)
-  - Pay-as-you-go (cheap for hobby use)
-  - Excellent structured output
-- **Free Alternatives**:
-  - Google Gemini API (free tier available)
-  - Anthropic Claude (limited free tier)
-  - Groq (free tier with fast inference)
-  - Together.ai (free credits initially)
-
-### Authentication
-- **Supabase Auth** (free, includes):
-  - Email/password
-  - Magic links
-  - OAuth (Google, GitHub, etc.)
-  - Built into Supabase if using their database
-
-### Hosting
-- **Frontend/API**: Vercel (Next.js creators)
-  - Free tier: unlimited personal projects
-  - Automatic deployments from Git
-  - Edge functions support
-- **Alternative**: Netlify (similar free tier)
+**Current Status**: MVP Phase Complete ✅
 
 ---
 
-## Database Schema
+## ✅ Completed Features
 
-### Core Tables
+### Phase 1: MVP Foundation (COMPLETE)
 
-#### users
-- id, email, display_name, role (GM/player)
-- created_at, updated_at
+#### ✅ Database & Infrastructure
+- ✅ Supabase project setup with PostgreSQL
+- ✅ Complete database schema (8 tables with RLS policies)
+  - users, campaigns, organizations, mission_types
+  - jobs, encounters, npcs, votes
+- ✅ Database migrations in version control
+- ✅ Row Level Security (RLS) policies for data protection
+- ✅ Indexes for performance optimization
 
-#### campaigns
-- id, gm_id (FK to users)
-- name, description
-- party_level (integer)
-- share_code (unique string for player access)
-- settings (JSON: theme preferences, etc.)
-- created_at, updated_at
+#### ✅ Authentication System
+- ✅ Supabase Auth integration
+- ✅ Email/password signup and login
+- ✅ Role-based access (GM/Player)
+- ✅ Protected routes with middleware (proxy.ts)
+- ✅ Server-side authentication checks
 
-#### organizations
-- id, campaign_id (FK)
-- name, description, faction_type
-- reputation_level
-- created_at
+#### ✅ LLM Integration
+- ✅ Provider abstraction layer (`lib/llm/provider.ts`)
+- ✅ OpenAI adapter (gpt-4o-mini primary)
+- ✅ Google Gemini adapter (gemini-2.5-flash fallback)
+- ✅ JSON mode for structured responses
+- ✅ Automatic fallback on provider failure
+- ✅ Prompt engineering for Starfinder 2E missions
 
-#### mission_types
-- id, campaign_id (FK)
-- name, description
-- tags (array: combat, exploration, social, etc.)
+#### ✅ GM Dashboard
+- ✅ Campaign listing page
+- ✅ Campaign creation with nanoid share codes
+- ✅ Campaign detail page with tabbed interface
+- ✅ Organizations tab (create, list)
+- ✅ Mission Types tab (create, list with tags)
+- ✅ Jobs tab (list, generate button)
 
-#### jobs
-- id, campaign_id, organization_id (FK)
-- title, description, mission_type
-- difficulty, reward, location
-- gm_notes (private)
-- status (available, in_progress, completed, rejected)
-- generated_at
-- llm_prompt_used (for regeneration)
+#### ✅ AI Job Generation
+- ✅ Job generation form (select org, mission type, difficulty)
+- ✅ LLM API route (`/api/jobs/generate`)
+- ✅ Contextual prompt building (party level, orgs, types)
+- ✅ Structured output (title, description, encounters, NPCs, GM notes)
+- ✅ Database persistence (jobs, encounters, npcs)
+- ✅ Job detail page with full encounter/NPC display
 
-#### encounters (GM view only)
-- id, job_id (FK)
-- encounter_type, description
-- enemies, tactics, terrain
-- challenge_rating
+#### ✅ Player Share View
+- ✅ Public share page (`/share/[shareCode]`)
+- ✅ Display active jobs with descriptions
+- ✅ Voting system (upvote/downvote)
+- ✅ Anonymous voting (session-based)
+- ✅ Authenticated voting (user-based)
+- ✅ Real-time vote count display
+- ✅ Optimistic UI updates
+- ✅ Vote API endpoint (`/api/votes`)
 
-#### npcs
-- id, job_id (FK)
-- name, role, personality
-- stats_block (JSON)
-- importance (major/minor)
-
-#### votes
-- id, job_id, user_id (FK)
-- vote_value (upvote/downvote or 1-5 rating)
-- created_at
-
----
-
-## Key Features & Implementation
-
-### Phase 1: MVP (Minimum Viable Product)
-
-#### 1. GM Dashboard
-- Create/manage campaign
-- Add organizations and mission types
-- Set party level
-- Generate jobs via LLM (single button)
-- View generated jobs with GM-only details
-- Manual job editing
-
-#### 2. Player View
-- Access via share link (no login initially)
-- View available jobs (limited details)
-- Vote on preferred missions
-- See vote tallies
-
-#### 3. LLM Job Generation
-- Prompt engineering for Starfinder 2E theme
-- Input: organizations, mission types, party level
-- Output: 3-5 job postings with structured data
-- Use JSON mode for structured responses
-
-### Phase 2: Enhanced GM Tools
-
-#### 4. Encounter Builder
-- Generate encounters for selected job
-- Enemy stat blocks
-- Tactical considerations
-- Environmental hazards
-
-#### 5. NPC Generator
-- Create quest givers, contacts, antagonists
-- Personality traits, motivations
-- Basic stat blocks
-
-#### 6. Plot Beat Generator
-- Story arc suggestions
-- Twist ideas
-- Complication generators
-
-### Phase 3: Polish & Advanced Features
-
-#### 7. Campaign Management
-- Job history
-- Track completed missions
-- Organization reputation system
-- Recurring NPCs/factions
-
-#### 8. Customization
-- Custom prompt templates
-- Setting-specific tweaks
-- Import/export campaigns
-
-#### 9. Collaboration
-- Player accounts (optional)
-- Comments on jobs
-- Session notes
+#### ✅ UI/UX Basics
+- ✅ Tailwind CSS styling
+- ✅ Responsive design (mobile-friendly)
+- ✅ Loading states
+- ✅ Error handling and display
+- ✅ Form validation (React Hook Form + Zod)
 
 ---
 
-## LLM Prompt Strategy
+## 🚧 Phase 2: Enhanced Features (NEXT STEPS)
 
-### Job Generation Prompt Structure
+### Priority 1: Complete CRUD Operations
 
-```
-System: You are a Starfinder 2E game master creating job postings...
+#### 1.1 Campaign Management
+- [ ] Edit campaign (name, party level)
+- [ ] Delete campaign (with confirmation)
+- [ ] Archive/restore campaigns
+- [ ] Campaign settings page
 
-Context:
-- Party Level: {level}
-- Organizations: {org_list}
-- Mission Types: {type_list}
-- Previous Jobs: {recent_jobs} (for variety)
+#### 1.2 Organizations
+- [ ] Edit organization details
+- [ ] Delete organization (check for dependent jobs)
+- [ ] Organization detail view
+- [ ] Track jobs per organization
 
-Task: Generate 3-5 diverse job postings in JSON format with:
-- title, employer, mission_type, difficulty, reward, brief_description, 
-  location, time_sensitivity, gm_notes (secrets/twists)
+#### 1.3 Mission Types
+- [ ] Edit mission type
+- [ ] Delete mission type (check dependencies)
+- [ ] Add/remove tags dynamically
 
-Ensure: Varied difficulty, different organizations, Starfinder 2E themes
-```
+#### 1.4 Jobs Management
+- [ ] Edit job (title, description, status)
+- [ ] Delete job (cascade to encounters/NPCs)
+- [ ] Change job status (active → completed → archived)
+- [ ] Regenerate job with LLM
+- [ ] Manual job creation (without LLM)
+- [ ] Bulk job operations
 
----
+### Priority 2: GM Tools & Analytics
 
-## Cost Estimation (Monthly)
+#### 2.1 Vote Analytics
+- [ ] Vote summary on GM dashboard
+- [ ] Most popular jobs highlighting
+- [ ] Vote history tracking
+- [ ] Export vote data
 
-### Free Tier
-- Vercel hosting: $0
-- Supabase: $0 (up to 500MB DB)
-- LLM API: ~$1-5 (light usage, GPT-3.5-turbo)
-- **Total: $1-5/month**
+#### 2.2 Job Organization
+- [ ] Filter jobs by status, organization, type
+- [ ] Search jobs by title/description
+- [ ] Sort by votes, date, difficulty
+- [ ] Pagination for large job lists
 
-### Paid Scaling (if needed)
-- Vercel Pro: $20/month (only if you need more)
-- Supabase Pro: $25/month (only at scale)
-- LLM costs scale with usage
+#### 2.3 Enhanced Job Details
+- [ ] Better encounter display (stats formatting)
+- [ ] NPC stat block improvements
+- [ ] Print-friendly view for GMs
+- [ ] Job difficulty indicators
 
----
+### Priority 3: Player Experience
 
-## Development Phases
+#### 3.1 Player Features
+- [ ] Job search/filter on player view
+- [ ] Sort by votes, difficulty, reward
+- [ ] Vote history (if authenticated)
+- [ ] Comments on jobs (optional)
 
-### Phase 1 (2-3 weeks): Core MVP
-- Next.js setup with Tailwind
-- Supabase integration
-- Basic CRUD for campaigns, orgs, mission types
-- LLM job generation (simple)
-- Share link functionality
-- Basic voting
+#### 3.2 Anonymous User Improvements
+- [ ] Prompt to sign up for persistent votes
+- [ ] Session vote migration on signup
+- [ ] Better onboarding for new players
 
-### Phase 2 (2 weeks): GM Enhancement
-- Encounter generation
-- NPC generation
-- Improved UI/UX
-- Job editing/regeneration
+### Priority 4: Testing & Quality
 
-### Phase 3 (1-2 weeks): Polish
-- Authentication refinement
-- Mobile responsiveness
-- Error handling
-- Loading states
-- Tutorial/onboarding
+#### 4.1 End-to-End Testing
+- [ ] GM flow: signup → create campaign → generate job
+- [ ] Player flow: visit share link → vote → see results
+- [ ] LLM fallback testing
+- [ ] Error scenarios (network failures, invalid data)
+- [ ] Vote conflict resolution
 
----
+#### 4.2 Unit Testing
+- [ ] LLM provider abstraction tests
+- [ ] API route tests
+- [ ] Database query tests
+- [ ] Utility function tests
 
-## Technical Considerations
-
-1. **Rate Limiting**: Implement on LLM calls to prevent abuse
-2. **Caching**: Cache LLM responses to reduce costs
-3. **Error Handling**: Graceful failures if LLM unavailable
-4. **Security**: 
-   - RLS in Supabase for data isolation
-   - Validate share codes server-side
-   - Sanitize LLM outputs
-5. **Performance**: 
-   - Streaming LLM responses for better UX
-   - Optimistic UI updates for voting
-
----
-
-## Alternative Free LLM Options
-
-If you want to avoid OpenAI costs entirely:
-- **Groq**: Free tier, very fast inference (Llama 3, Mixtral)
-- **Together.ai**: Free credits, various open models
-- **Ollama**: Self-hosted (requires your own server/computer)
-- **Google Gemini**: Generous free tier
+#### 4.3 Performance
+- [ ] Database query optimization
+- [ ] LLM response caching
+- [ ] Rate limiting on job generation
+- [ ] Image optimization (if added)
 
 ---
 
-## Recommended Starting Point
+## 🔮 Phase 3: Advanced Features (FUTURE)
 
-1. Set up Next.js project with Tailwind
-2. Create Supabase project and define schema
-3. Build basic GM dashboard (CRUD operations)
-4. Integrate LLM for job generation (start with Groq or Gemini free tier)
-5. Create share link + player view
-6. Add voting functionality
-7. Iterate and expand
+### 3.1 Enhanced AI Generation
+- [ ] Custom prompt templates
+- [ ] Setting-specific tweaks (not just Starfinder)
+- [ ] Multiple job generation (batch)
+- [ ] AI plot twist generator
+- [ ] Session recap generator
+
+### 3.2 Campaign Progression
+- [ ] Mark jobs as completed
+- [ ] Track campaign timeline
+- [ ] Recurring NPCs/factions
+- [ ] Organization reputation system
+- [ ] XP/level recommendations
+
+### 3.3 Collaboration Features
+- [ ] Co-GM support (multiple GMs per campaign)
+- [ ] Player accounts with profiles
+- [ ] Session notes shared with party
+- [ ] Character integration (link players to characters)
+
+### 3.4 Import/Export
+- [ ] Export campaign as JSON
+- [ ] Import campaign data
+- [ ] Share job templates
+- [ ] Community job library (optional)
+
+### 3.5 Customization
+- [ ] Theme preferences (dark mode, colors)
+- [ ] Custom mission type icons
+- [ ] Campaign branding (logo, colors)
+- [ ] Email notifications (optional)
 
 ---
 
-## Notes
+## 🛠️ Technical Debt & Improvements
 
-This plan keeps costs minimal while providing a solid foundation for expansion. The entire stack can run on free tiers initially, only requiring LLM API costs which should be $1-5/month for hobby use.
+### Code Quality
+- [ ] Add comprehensive error boundaries
+- [ ] Improve TypeScript type coverage
+- [ ] Refactor repeated UI patterns into reusable components
+- [ ] Add JSDoc comments for complex functions
+- [ ] Code splitting for better performance
+
+### Database
+- [ ] Apply vote constraints migration (`20251108000003_fix_votes_constraints.sql`)
+- [ ] Add database indexes for common queries
+- [ ] Implement database backups
+- [ ] Add soft delete for important entities
+
+### Security
+- [ ] Rate limiting on API routes
+- [ ] CSRF protection
+- [ ] Input sanitization for LLM outputs
+- [ ] Audit RLS policies
+- [ ] API key rotation strategy
+
+### Deployment
+- [ ] Create deployment guide
+- [ ] Environment variable documentation
+- [ ] Production database setup guide
+- [ ] Vercel deployment configuration
+- [ ] CI/CD pipeline (GitHub Actions)
+
+---
+
+## 📊 Current Architecture
+
+### Technology Stack (Implemented)
+- **Frontend**: Next.js 16 (App Router), React 19, TypeScript 5
+- **Styling**: Tailwind CSS 4
+- **Database**: Supabase (PostgreSQL)
+- **Authentication**: Supabase Auth
+- **LLM**: OpenAI (gpt-4o-mini) + Google Gemini (fallback)
+- **Forms**: React Hook Form + Zod
+- **State**: React useState/useEffect (no global state yet)
+
+### API Routes
+- `POST /api/jobs/generate` - Generate jobs with LLM
+- `POST /api/votes` - Submit/update/delete votes
+- `POST /api/auth/create-profile` - User profile creation
+
+### Key Components
+- `CampaignTabs` - Tabbed interface for campaign management
+- `JobsTab` - Job listing with generation button
+- `OrganizationsTab` - Organization CRUD
+- `MissionTypesTab` - Mission type CRUD
+- `JobVotingCard` - Player voting interface
+
+---
+
+## 💰 Cost Considerations
+
+### Current Monthly Costs (Hobby Use)
+- **Hosting**: $0 (Vercel free tier)
+- **Database**: $0 (Supabase free tier, 500MB)
+- **LLM API**: ~$1-5 (light usage with gpt-4o-mini)
+- **Total**: $1-5/month ✅
+
+### Scaling Costs (If Needed)
+- Vercel Pro: $20/month (advanced features)
+- Supabase Pro: $25/month (higher limits)
+- LLM costs scale with usage (consider caching)
+
+---
+
+## 🎯 Immediate Next Steps (Priority Order)
+
+1. **Apply database migration** for vote constraints
+2. **Complete CRUD operations** for campaigns, organizations, mission types
+3. **Add job editing** (status changes, regeneration)
+4. **Implement filtering/search** on jobs tab
+5. **End-to-end testing** of full GM → player flow
+6. **Vote analytics** for GM dashboard
+7. **Mobile UI polish** (ensure all pages work on phones)
+8. **Deployment documentation** for Vercel
+9. **Error handling improvements** (better user feedback)
+10. **Performance optimization** (database query caching)
+
+---
+
+## 📝 Notes
+
+- The current implementation is production-ready for MVP use
+- Free tier stack can support 10-20 active campaigns easily
+- LLM responses are cached in the database (llm_raw_response field)
+- All database tables have proper indexes and RLS policies
+- Authentication is handled entirely by Supabase (no custom auth code)

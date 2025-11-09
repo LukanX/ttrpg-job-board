@@ -1,36 +1,175 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Starfinder 2E Job Board
 
-## Getting Started
+An AI-powered TTRPG mission board for Starfinder 2nd Edition. GMs can generate and manage campaign missions using LLMs, while players vote on which adventures to tackle next.
 
-First, run the development server:
+## ✨ Features
 
+### For Game Masters
+- 🎲 **AI Job Generation** - Generate Starfinder 2E missions with OpenAI (primary) or Google Gemini (fallback)
+- 📋 **Campaign Management** - Create campaigns, set party levels, manage share codes
+- 🏢 **Organizations & Factions** - Define quest givers and mission sources
+- 🎯 **Mission Types** - Categorize missions (exploration, combat, investigation, etc.)
+- 🔒 **GM Notes** - Private notes and secrets for each mission
+- 📊 **Vote Tracking** - See which missions your players want to play
+
+### For Players
+- 🔗 **Share Links** - Access campaigns via unique share codes (no login required)
+- 👍 **Voting System** - Upvote/downvote missions to influence the next session
+- 📱 **Responsive UI** - Works on desktop and mobile
+- 💾 **Anonymous or Authenticated** - Vote as a guest or sign in for persistent votes
+
+## 🚀 Tech Stack
+
+- **Framework**: [Next.js 16](https://nextjs.org/) (App Router, React 19)
+- **Database**: [Supabase](https://supabase.com/) (PostgreSQL with RLS)
+- **Authentication**: Supabase Auth
+- **Styling**: [Tailwind CSS 4](https://tailwindcss.com/)
+- **LLM APIs**: 
+  - OpenAI (gpt-4o-mini) - Primary
+  - Google Gemini (gemini-2.5-flash) - Fallback
+- **Forms**: React Hook Form + Zod validation
+- **Deployment**: Vercel-ready
+
+## 📦 Getting Started
+
+### Prerequisites
+- Node.js 20.x or higher
+- A Supabase account (free tier works)
+- OpenAI API key and/or Google AI API key
+
+### Installation
+
+1. **Clone the repository**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone <your-repo-url>
+cd job-board
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+2. **Install dependencies**
+```bash
+npm install
+```
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+3. **Set up environment variables**
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Create a `.env.local` file in the root directory:
 
-## Learn More
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_project_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+SUPABASE_SERVICE_ROLE_KEY=your_supabase_service_role_key
 
-To learn more about Next.js, take a look at the following resources:
+# LLM APIs (need at least one)
+OPENAI_API_KEY=your_openai_api_key
+GOOGLE_API_KEY=your_google_ai_api_key
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+# App
+NEXT_PUBLIC_APP_URL=http://localhost:3000
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+4. **Set up the database**
 
-## Deploy on Vercel
+Run the migrations in your Supabase project:
+- Go to your Supabase dashboard → SQL Editor
+- Run the SQL files in `supabase/migrations/` in order
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+5. **Run the development server**
+```bash
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) to see the app.
+
+## 🎮 Usage
+
+### As a GM
+
+1. **Sign up** and select "Game Master" as your role
+2. **Create a campaign** with a name and party level
+3. **Add organizations** (quest givers like corporations, factions)
+4. **Add mission types** (e.g., "Exploration", "Bounty Hunting", "Investigation")
+5. **Generate jobs** using AI - select organization, mission type, and difficulty
+6. **Share the link** with your players using the campaign's share code
+
+### As a Player
+
+1. **Visit the share link** provided by your GM (`/share/[shareCode]`)
+2. **View available missions** with descriptions, rewards, and difficulty
+3. **Vote** on missions you want to play (👍 upvote, 👎 downvote)
+4. **See results** - net votes help the GM choose the next adventure
+
+## 📁 Project Structure
+
+```
+job-board/
+├── app/
+│   ├── (auth)/              # Authentication pages
+│   │   ├── login/
+│   │   └── signup/
+│   ├── gm/                  # GM-only routes
+│   │   ├── dashboard/       # Campaign list
+│   │   └── campaigns/[id]/  # Campaign detail with tabs
+│   ├── share/[shareCode]/   # Player voting page
+│   └── api/                 # API routes
+│       ├── jobs/generate/   # LLM job generation
+│       └── votes/           # Voting endpoint
+├── components/
+│   └── ui/                  # shadcn/ui components
+├── lib/
+│   ├── llm/                 # LLM provider abstraction
+│   │   ├── provider.ts      # Main interface
+│   │   ├── openai.ts        # OpenAI adapter
+│   │   └── gemini.ts        # Gemini adapter
+│   └── supabase/            # Supabase clients
+├── supabase/migrations/     # Database schema
+└── types/                   # TypeScript types
+```
+
+## 🗄️ Database Schema
+
+- **users** - User accounts (GM/player roles)
+- **campaigns** - Campaign metadata and share codes
+- **organizations** - Quest-giving factions
+- **mission_types** - Mission categories
+- **jobs** - Generated missions with LLM responses
+- **encounters** - Combat/exploration encounters
+- **npcs** - Quest givers, allies, antagonists
+- **votes** - Player votes (supports anonymous via session_id)
+
+## 🔐 Security
+
+- Row Level Security (RLS) on all Supabase tables
+- API keys stored in environment variables (never committed)
+- Server-side authentication checks
+- Vote validation (one vote per user/session per job)
+
+## 🚧 Roadmap
+
+See [IMPLEMENTATION_PLAN.md](./IMPLEMENTATION_PLAN.md) for detailed next steps.
+
+**Current Status: MVP Complete** ✅
+- ✅ GM dashboard with campaign management
+- ✅ AI job generation (OpenAI + Gemini fallback)
+- ✅ Player share view with voting
+- ✅ Anonymous and authenticated voting
+
+**Next Steps:**
+- [ ] Complete CRUD operations (edit/delete for all entities)
+- [ ] Job status management (active/completed/archived)
+- [ ] Enhanced job detail view with encounters/NPCs
+- [ ] Vote analytics for GMs
+- [ ] End-to-end testing
+- [ ] Mobile UI polish
+- [ ] Deployment documentation
+
+## 📄 License
+
+MIT
+
+## 🙏 Acknowledgments
+
+- Built with [Next.js](https://nextjs.org/)
+- Styled with [Tailwind CSS](https://tailwindcss.com/)
+- Powered by [Supabase](https://supabase.com/)
+- AI by [OpenAI](https://openai.com/) and [Google Gemini](https://ai.google.dev/)
