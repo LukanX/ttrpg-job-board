@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Edit } from 'lucide-react'
 import type { Campaign, Organization, MissionType, Job } from '@/types/database'
 import CampaignTabs from './CampaignTabs'
 
@@ -63,13 +64,23 @@ export default async function CampaignPage({ params }: PageProps) {
             ← Back to Campaigns
           </Link>
           <div className="flex justify-between items-start">
-            <div>
+              <div>
               <h1 className="text-3xl font-bold text-gray-900">
                 {campaign.name}
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Party Level: {campaign.party_level}
               </p>
+              <div className="mt-3">
+                <Link
+                  href={`/gm/campaigns/${id}/edit`}
+                  aria-label={`Edit ${campaign.name}`}
+                  className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-100"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  <span>Edit Campaign</span>
+                </Link>
+              </div>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">Share Code</p>

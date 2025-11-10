@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
+import { Edit } from 'lucide-react'
 import type { Campaign } from '@/types/database'
 
 export default async function GMDashboard() {
@@ -43,15 +44,27 @@ export default async function GMDashboard() {
         {campaigns && campaigns.length > 0 ? (
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
             {campaigns.map((campaign: Campaign) => (
-              <Link
+              <div
                 key={campaign.id}
-                href={`/gm/campaigns/${campaign.id}`}
                 className="bg-white overflow-hidden shadow rounded-lg hover:shadow-md transition-shadow"
               >
                 <div className="p-6">
-                  <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                    {campaign.name}
-                  </h3>
+                  <div className="flex justify-between items-start">
+                    <Link href={`/gm/campaigns/${campaign.id}`} className="inline-block">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2">
+                        {campaign.name}
+                      </h3>
+                    </Link>
+                    <Link
+                      href={`/gm/campaigns/${campaign.id}/edit`}
+                      aria-label={`Edit ${campaign.name}`}
+                      className="ml-4 inline-flex items-center justify-center rounded-md p-2 text-blue-600 hover:bg-gray-100"
+                    >
+                      <Edit className="h-4 w-4" />
+                      <span className="sr-only">Edit {campaign.name}</span>
+                    </Link>
+                  </div>
+
                   <div className="space-y-2 text-sm text-gray-600">
                     <p>Party Level: {campaign.party_level}</p>
                     <p className="font-mono text-xs bg-gray-100 px-2 py-1 rounded">
@@ -62,7 +75,7 @@ export default async function GMDashboard() {
                     </p>
                   </div>
                 </div>
-              </Link>
+              </div>
             ))}
           </div>
         ) : (
