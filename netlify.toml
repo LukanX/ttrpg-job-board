@@ -4,7 +4,5 @@
 
 [build.environment]
   NODE_VERSION = "24"
-
-# Exclude NEXT_PUBLIC_ env vars from secrets scanning (they are public by design)
-[functions]
+  # Exclude NEXT_PUBLIC_ env vars from secrets scanning (they are public by design in Next.js)
   SECRETS_SCAN_OMIT_KEYS = "NEXT_PUBLIC_APP_URL,NEXT_PUBLIC_SUPABASE_URL,NEXT_PUBLIC_SUPABASE_ANON_KEY"
