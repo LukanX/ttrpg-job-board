@@ -48,8 +48,31 @@ describe('PATCH /api/campaigns/:id - error cases', () => {
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
     const req: any = { json: async () => ({ name: 'New Name', party_level: 5 }) }
-    const res = await PATCH(req, { params: { id: 'camp-1' } } as any)
+    // Use helper to spy+assert console.error around the async operation
+    const { withConsoleErrorSpy } = require('@/tests/helpers/consoleSpy')
+    await withConsoleErrorSpy(
+      async () => {
+        const res = await PATCH(req, { params: { id: 'camp-1' } } as any)
+        expect((res as any).status).toBe(500)
+        return res
+      },
+      async (consoleSpy: jest.SpyInstance) => {
+        // Ensure two error logs happened (failure and payload)
+        expect(consoleSpy).toHaveBeenCalledTimes(2)
 
-    expect((res as any).status).toBe(500)
+        // First call: should indicate the update failed and include the DB error
+        expect(consoleSpy.mock.calls[0][0]).toMatch(/Failed to update campaign/i)
+        expect(consoleSpy.mock.calls[0][1]).toEqual(expect.objectContaining({ message: 'DB failure' }))
+
+        // Second call: should include the payload object and campaign id
+        expect(consoleSpy.mock.calls[1][0]).toMatch(/Update payload/i)
+        expect(consoleSpy.mock.calls[1][1]).toEqual(
+          expect.objectContaining({ name: 'New Name', party_level: 5 })
+        )
+        // The route logs: 'Update payload:', updatePayload, 'campaignId:', campaignId
+        expect(consoleSpy.mock.calls[1][2]).toBe('campaignId:')
+        expect(consoleSpy.mock.calls[1][3]).toBe('camp-1')
+      }
+    )
   })
 })

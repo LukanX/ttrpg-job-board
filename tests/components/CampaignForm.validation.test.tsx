@@ -10,23 +10,7 @@ jest.mock('@/lib/supabase/client', () => ({
   }),
 }))
 
-// Mock zod resolver to avoid throwing ZodError in the test environment; convert to RHF error shape
-jest.mock('@hookform/resolvers/zod', () => ({
-  zodResolver: (schema: any) => {
-    return (data: any) => {
-      const result = schema.safeParse(data)
-      if (!result.success) {
-        const errors: any = {}
-        for (const issue of result.error.issues) {
-          const path = issue.path.join('.')
-          errors[path] = { message: issue.message, type: issue.code }
-        }
-        return { values: {}, errors }
-      }
-      return { values: result.data, errors: {} }
-    }
-  },
-}))
+// zodResolver is provided globally in jest.setup.ts to keep tests stable
 
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'

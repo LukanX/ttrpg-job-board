@@ -278,14 +278,14 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ## Phase 1 MVP Checklist
 
 - [x] Next.js project setup with TypeScript and Tailwind
-- [ ] Supabase project created and schema defined
-- [ ] Authentication implemented (Supabase Auth)
+- [x] Supabase project created and schema defined
+- [x] Authentication implemented (Supabase Auth)
 - [ ] GM dashboard with campaign CRUD
 - [ ] Organization and mission type management
-- [ ] LLM job generation endpoint
-- [ ] Share link functionality
-- [ ] Player view with job listing
-- [ ] Voting system with real-time updates
+- [x] LLM job generation endpoint
+- [x] Share link functionality
+- [x] Player view with job listing
+- [x] Voting system with real-time updates
 - [ ] Basic error handling and loading states
 
 ## Common Patterns
