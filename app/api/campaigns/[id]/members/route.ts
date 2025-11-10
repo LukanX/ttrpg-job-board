@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
 import { createClient } from '@/lib/supabase/server'
+import { randomUUID } from 'crypto'
+import { sendInviteEmail } from '@/lib/mailer/sendgrid'
 
 // Schema for adding a member
 const AddMemberSchema = z.object({
@@ -136,10 +138,38 @@ export async function POST(
       .single()
 
     if (userError || !targetUser) {
-      return NextResponse.json(
-        { error: 'User not found with that email' },
-        { status: 404 }
-      )
+      // Create an invitation so the invited person can sign up and be auto-added
+      const token = randomUUID()
+      // Default expiry: 30 days from now
+      const EXPIRY_DAYS = 30
+      const expiresAt = new Date(Date.now() + EXPIRY_DAYS * 24 * 60 * 60 * 1000).toISOString()
+
+      const { data: invited, error: inviteError } = await supabase
+        .from('campaign_invitations')
+        .insert({ campaign_id: campaignId, email, role, token, invited_by: user.id, expires_at: expiresAt })
+        .select('id, campaign_id, email, role, token, invited_by, created_at, expires_at')
+        .single()
+
+      if (inviteError) {
+        console.error('Error creating invitation:', inviteError)
+        return NextResponse.json({ error: 'Failed to create invitation' }, { status: 500 })
+      }
+
+      // Try to send an invitation email (non-blocking)
+      try {
+        // attempt to look up campaign name for nicer email
+        const { data: campaignData } = await supabase
+          .from('campaigns')
+          .select('name')
+          .eq('id', campaignId)
+          .single()
+
+  await sendInviteEmail(email, token, campaignData?.name)
+      } catch (mailErr) {
+        console.warn('Failed to send invite email (non-fatal):', mailErr)
+      }
+
+      return NextResponse.json({ invitation: invited }, { status: 201 })
     }
 
     // Check if user is already a member

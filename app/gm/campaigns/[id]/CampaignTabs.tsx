@@ -13,6 +13,7 @@ interface Props {
   missionTypes: MissionType[]
   jobs: Job[]
   initialMembers?: any[]
+  initialInvitations?: any[]
 }
 
 type TabType = 'jobs' | 'organizations' | 'mission-types' | 'members'
@@ -23,6 +24,7 @@ export default function CampaignTabs({
   missionTypes,
   jobs,
   initialMembers,
+  initialInvitations,
   userRole,
   canManage,
   membersCount,
@@ -85,6 +87,7 @@ export default function CampaignTabs({
             userRole={userRole as any}
             canManage={!!canManage}
             initialMembers={initialMembers}
+            initialInvitations={initialInvitations}
           />
         )}
       </div>

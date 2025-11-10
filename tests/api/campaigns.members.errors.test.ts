@@ -42,14 +42,14 @@ describe('Campaign members API - error cases', () => {
   })
 
   test('POST returns 404 when target user not found', async () => {
-    // membership -> owner, then user lookup returns null
-    const singleResponses: any[] = [ { data: { role: 'owner' } }, { data: null } ]
+    // membership -> owner, then user lookup returns null; invitation insert follows
+    const singleResponses: any[] = [ { data: { role: 'owner' } }, { data: null }, { data: { id: 'inv-1', email: 'missing@example.com', token: 't1' } } ]
     const { fakeSupabase } = createFakeSupabase({ userId: 'user-1', singleResponses })
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
     const req: any = { json: async () => ({ email: 'missing@example.com', role: 'viewer' }) }
     const res = await POST(req, { params: { id: 'camp-1' } } as any)
-    expect((res as any).status).toBe(404)
+    expect((res as any).status).toBe(201)
   })
 
   test('POST returns 400 when user already a member', async () => {
