@@ -1,6 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
+import { Edit } from 'lucide-react'
 import type { Campaign, Organization, MissionType, Job } from '@/types/database'
 import CampaignTabs from './CampaignTabs'
 
@@ -20,17 +21,39 @@ export default async function CampaignPage({ params }: PageProps) {
     redirect('/login')
   }
 
+  // Check campaign membership (with fallback for pre-migration compatibility)
+  const { data: membership, error: memberError } = await supabase
+    .from('campaign_members')
+    .select('role')
+    .eq('campaign_id', id)
+    .eq('user_id', user.id)
+    .single()
+
   // Fetch campaign
   const { data: campaign, error: campaignError } = await supabase
     .from('campaigns')
     .select('*')
     .eq('id', id)
-    .eq('gm_id', user.id)
     .single()
 
   if (campaignError || !campaign) {
     notFound()
   }
+
+  // If campaign_members table doesn't exist yet (pre-migration), check gm_id instead
+  if (memberError && !membership) {
+    // Fallback to gm_id check
+    if (campaign.gm_id !== user.id) {
+      notFound()
+    }
+  } else if (!membership) {
+    // campaign_members exists but user is not a member
+    notFound()
+  }
+
+  // Determine user role: membership preferred, fallback to gm_id owner
+  const userRole = membership?.role ?? (campaign.gm_id === user.id ? 'owner' : null)
+  const canManageMembers = userRole === 'owner'
 
   // Fetch related data
   const { data: organizations } = await supabase
@@ -51,6 +74,30 @@ export default async function CampaignPage({ params }: PageProps) {
     .eq('campaign_id', id)
     .order('created_at', { ascending: false })
 
+  // Fetch member count for the Members tab (server-side) so the tab shows an immediate count
+  // Also fetch the full members list server-side so we can pass initial data to the client
+  const { data: members } = await supabase
+    .from('campaign_members')
+    .select(
+      `
+      id,
+      campaign_id,
+      user_id,
+      role,
+      created_at,
+      users:user_id (
+        id,
+        email,
+        display_name
+      )
+    `
+    )
+    .eq('campaign_id', id)
+    .order('created_at', { ascending: true })
+
+  const membersList = members || []
+  const membersCount = membersList.length
+
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
@@ -63,13 +110,23 @@ export default async function CampaignPage({ params }: PageProps) {
             ← Back to Campaigns
           </Link>
           <div className="flex justify-between items-start">
-            <div>
+              <div>
               <h1 className="text-3xl font-bold text-gray-900">
                 {campaign.name}
               </h1>
               <p className="text-sm text-gray-600 mt-1">
                 Party Level: {campaign.party_level}
               </p>
+              <div className="mt-3">
+                <Link
+                  href={`/gm/campaigns/${id}/edit`}
+                  aria-label={`Edit ${campaign.name}`}
+                  className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-100"
+                >
+                  <Edit className="h-4 w-4 mr-2" />
+                  <span>Edit Campaign</span>
+                </Link>
+              </div>
             </div>
             <div className="text-right">
               <p className="text-sm text-gray-600">Share Code</p>
@@ -88,12 +145,16 @@ export default async function CampaignPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs (Members tab now included) */}
         <CampaignTabs
           campaignId={id}
           organizations={organizations || []}
           missionTypes={missionTypes || []}
           jobs={jobs || []}
+          userRole={userRole as any}
+          canManage={canManageMembers}
+          membersCount={membersCount}
+          initialMembers={membersList}
         />
       </div>
     </div>

@@ -3,6 +3,15 @@
 ## Project Overview
 This is an LLM-powered job board for TTRPGs, with the MVP being focused on Starfinder 2E. GMs can manage campaigns and generate AI-powered job postings, while players can view and vote on missions via shared links.
 
+## Task Planning and Problem Solving
+
+- Before each task, you must first complete the following steps:
+  1. Provide a full plan of your changes.
+  2. Provide a list of behaviors that you'll change.
+  3. Provide a list of test cases to add.
+- Before you add any code, always check if you can just re-use
+  or re-configure any existing code to achieve the result.
+
 
 ## Technology Stack
 
@@ -29,6 +38,8 @@ This is an LLM-powered job board for TTRPGs, with the MVP being focused on Starf
 - Use test doubles (mocks, stubs, spies) appropriately
 - Implement integration tests for API endpoints and user flows
 - Keep tests fast, isolated, and deterministic
+ - Use typed test helpers for common patterns (e.g., `tests/helpers/consoleSpy.ts`) to standardize mocks/spies and keep tests quiet while allowing assertions on logs
+ - Prefer asserting on logged errors (with a spy) rather than only silencing them when the log is part of the behavior under test
 
 ## AI Code Generation Preferences
 
@@ -269,14 +280,14 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 ## Phase 1 MVP Checklist
 
 - [x] Next.js project setup with TypeScript and Tailwind
-- [ ] Supabase project created and schema defined
-- [ ] Authentication implemented (Supabase Auth)
+- [x] Supabase project created and schema defined
+- [x] Authentication implemented (Supabase Auth)
 - [ ] GM dashboard with campaign CRUD
 - [ ] Organization and mission type management
-- [ ] LLM job generation endpoint
-- [ ] Share link functionality
-- [ ] Player view with job listing
-- [ ] Voting system with real-time updates
+- [x] LLM job generation endpoint
+- [x] Share link functionality
+- [x] Player view with job listing
+- [x] Voting system with real-time updates
 - [ ] Basic error handling and loading states
 
 ## Common Patterns

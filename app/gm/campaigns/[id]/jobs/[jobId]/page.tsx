@@ -1,5 +1,7 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
+import Link from 'next/link'
+import { Edit } from 'lucide-react'
 import type { Job, Organization, MissionType, Encounter, NPC } from '@/types/database'
 
 interface Props {
@@ -37,12 +39,26 @@ export default async function JobDetailPage({ params }: Props) {
   // Fetch campaign to verify ownership
   const { data: campaign } = await supabase
     .from('campaigns')
-    .select('*')
+    .select('gm_id')
     .eq('id', campaignId)
-    .eq('gm_id', user.id)
     .single()
 
-  if (!campaign) {
+  // Check permissions for edit button visibility
+  const isCreator = job.created_by === user.id
+  const isOwner = campaign?.gm_id === user.id
+
+  // Check if user is a co-GM
+  const { data: membership } = await supabase
+    .from('campaign_members')
+    .select('role')
+    .eq('campaign_id', campaignId)
+    .eq('user_id', user.id)
+    .single()
+
+  const isCoGM = membership?.role === 'co-gm'
+  const canEdit = isCreator || isOwner || isCoGM
+
+  if (!campaign && !membership) {
     notFound()
   }
 
@@ -96,14 +112,25 @@ export default async function JobDetailPage({ params }: Props) {
         {/* Job Header */}
         <div className="bg-white shadow rounded-lg p-8 mb-6">
           <div className="flex justify-between items-start mb-4">
-            <div>
+            <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
               <div className="flex items-center gap-4 text-sm text-gray-600">
                 {organization && <span>📍 {organization.name}</span>}
                 {missionType && <span>🎯 {missionType.name}</span>}
               </div>
             </div>
-            {getStatusBadge(job.status)}
+            <div className="flex items-center gap-3">
+              {getStatusBadge(job.status)}
+              {canEdit && (
+                <Link
+                  href={`/gm/campaigns/${campaignId}/jobs/${jobId}/edit`}
+                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200"
+                >
+                  <Edit className="h-4 w-4" />
+                  Edit
+                </Link>
+              )}
+            </div>
           </div>
 
           <div className="flex items-center gap-6 mb-6">

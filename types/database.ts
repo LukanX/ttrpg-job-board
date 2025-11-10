@@ -51,6 +51,7 @@ export interface Job {
   status: 'active' | 'completed' | 'archived'
   gm_notes: string | null
   llm_raw_response: Record<string, any> | null
+  created_by: string
   created_at: string
   updated_at: string
 }
@@ -84,4 +85,25 @@ export interface Vote {
   session_id: string | null
   vote_value: 1 | -1
   created_at: string
+}
+
+// Campaign membership types
+export type CampaignMemberRole = 'owner' | 'co-gm' | 'viewer'
+
+export interface CampaignMember {
+  id: string
+  campaign_id: string
+  user_id: string
+  role: CampaignMemberRole
+  created_at: string
+  updated_at: string
+}
+
+// Extended types with relations
+export interface CampaignWithMembers extends Campaign {
+  members?: CampaignMember[]
+}
+
+export interface JobWithCreator extends Job {
+  creator?: Pick<User, 'id' | 'display_name' | 'email'>
 }

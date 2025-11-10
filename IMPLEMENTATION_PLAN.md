@@ -75,10 +75,16 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 ### Priority 1: Complete CRUD Operations
 
 #### 1.1 Campaign Management
-- [ ] Edit campaign (name, party level)
+- ✅ Edit campaign (name, party level)
 - [ ] Delete campaign (with confirmation)
 - [ ] Archive/restore campaigns
 - [ ] Campaign settings page
+ - [ ] Campaign member management UI (invite / remove / change roles for co-GMs)
+   - Create `components/gm/CampaignMembers.tsx` (client component)
+   - Wire into `app/gm/campaigns/[id]/page.tsx` and gate visibility to owners/co-GMs
+   - Features: list members, invite by email, change role, remove member, confirmation modal
+   - Acceptance: owners can invite/change/remove members; non-members cannot see controls
+   - Estimated effort: 3-6 hours (MVP)
 
 #### 1.2 Organizations
 - [ ] Edit organization details
@@ -92,9 +98,9 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - [ ] Add/remove tags dynamically
 
 #### 1.4 Jobs Management
-- [ ] Edit job (title, description, status)
+- ✅ Edit job (title, description, status)
 - [ ] Delete job (cascade to encounters/NPCs)
-- [ ] Change job status (active → completed → archived)
+- ✅ Change job status (active → completed → archived)
 - [ ] Regenerate job with LLM
 - [ ] Manual job creation (without LLM)
 - [ ] Bulk job operations
@@ -146,6 +152,11 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - [ ] API route tests
 - [ ] Database query tests
 - [ ] Utility function tests
+ - [ ] Membership & permission tests
+   - Unit tests for `app/api/campaigns/[id]/members/route.ts` (GET/POST/PATCH/DELETE)
+   - Integration tests for permission semantics (owner vs co-gm vs non-member) across campaign/job endpoints
+   - UI tests for `components/gm/CampaignMembers.tsx` (render, invite, change role, remove)
+   - Estimated effort: 2-4 hours for initial coverage
 
 #### 4.3 Performance
 - [ ] Database query optimization

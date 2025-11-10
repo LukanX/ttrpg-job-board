@@ -53,16 +53,27 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid request parameters' }, { status: 400 })
     }
 
-    // Fetch campaign to ensure user owns it and get party level
+    // Check campaign membership
+    const { data: membership, error: memberError } = await supabase
+      .from('campaign_members')
+      .select('role')
+      .eq('campaign_id', campaignId)
+      .eq('user_id', user.id)
+      .single()
+
+    if (memberError || !membership) {
+      return NextResponse.json({ error: 'Campaign not found or access denied' }, { status: 404 })
+    }
+
+    // Fetch campaign to get party level
     const { data: campaign, error: campaignError } = await supabase
       .from('campaigns')
       .select('*')
       .eq('id', campaignId)
-      .eq('gm_id', user.id)
       .single()
 
     if (campaignError || !campaign) {
-      return NextResponse.json({ error: 'Campaign not found or access denied' }, { status: 404 })
+      return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
     }
 
     // Fetch organization and mission type if provided
@@ -155,6 +166,7 @@ export async function POST(request: NextRequest) {
         status: 'active',
         gm_notes: jobData.gm_notes || null,
         llm_raw_response: jobData,
+        created_by: user.id,
       })
       .select()
       .single()
