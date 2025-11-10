@@ -21,15 +21,33 @@ export default async function CampaignPage({ params }: PageProps) {
     redirect('/login')
   }
 
+  // Check campaign membership (with fallback for pre-migration compatibility)
+  const { data: membership, error: memberError } = await supabase
+    .from('campaign_members')
+    .select('role')
+    .eq('campaign_id', id)
+    .eq('user_id', user.id)
+    .single()
+
   // Fetch campaign
   const { data: campaign, error: campaignError } = await supabase
     .from('campaigns')
     .select('*')
     .eq('id', id)
-    .eq('gm_id', user.id)
     .single()
 
   if (campaignError || !campaign) {
+    notFound()
+  }
+
+  // If campaign_members table doesn't exist yet (pre-migration), check gm_id instead
+  if (memberError && !membership) {
+    // Fallback to gm_id check
+    if (campaign.gm_id !== user.id) {
+      notFound()
+    }
+  } else if (!membership) {
+    // campaign_members exists but user is not a member
     notFound()
   }
 

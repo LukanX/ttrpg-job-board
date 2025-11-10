@@ -41,7 +41,24 @@ export async function PATCH(request: NextRequest, { params }: { params: { id?: s
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Fetch campaign and ensure ownership
+    // Check campaign membership and role
+    const { data: membership, error: memberError } = await supabase
+      .from('campaign_members')
+      .select('role')
+      .eq('campaign_id', campaignId)
+      .eq('user_id', user.id)
+      .single()
+
+    if (memberError || !membership) {
+      return NextResponse.json({ error: 'Campaign not found or access denied' }, { status: 404 })
+    }
+
+    // Only owners and co-gms can update campaigns
+    if (!['owner', 'co-gm'].includes(membership.role)) {
+      return NextResponse.json({ error: 'Forbidden: insufficient permissions' }, { status: 403 })
+    }
+
+    // Fetch campaign to ensure it exists
     const { data: existingCampaign, error: fetchError } = await supabase
       .from('campaigns')
       .select('*')
@@ -50,10 +67,6 @@ export async function PATCH(request: NextRequest, { params }: { params: { id?: s
 
     if (fetchError || !existingCampaign) {
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
-    }
-
-    if (existingCampaign.gm_id !== user.id) {
-      return NextResponse.json({ error: 'Forbidden' }, { status: 403 })
     }
 
     const updatePayload: any = {

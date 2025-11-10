@@ -15,15 +15,42 @@ export default async function GMDashboard() {
     redirect('/login')
   }
 
-  // Fetch user's campaigns
-  const { data: campaigns, error } = await supabase
-    .from('campaigns')
-    .select('*')
-    .eq('gm_id', user.id)
-    .order('created_at', { ascending: false })
+  // Fetch user's campaigns (try campaign_members first, fallback to gm_id for migration compatibility)
+  const { data: campaignMembers, error: membersError } = await supabase
+    .from('campaign_members')
+    .select('campaign_id, role')
+    .eq('user_id', user.id)
 
-  if (error) {
-    console.error('Error fetching campaigns:', error)
+  let campaigns = null
+
+  // If campaign_members table exists and has data, use it
+  if (!membersError && campaignMembers && campaignMembers.length > 0) {
+    const campaignIds = campaignMembers.map(m => m.campaign_id)
+    const { data, error } = await supabase
+      .from('campaigns')
+      .select('*')
+      .in('id', campaignIds)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching campaigns:', error)
+    } else {
+      campaigns = data
+    }
+  } else {
+    // Fallback: fetch campaigns by gm_id (for pre-migration compatibility)
+    console.log('Using fallback gm_id query (campaign_members table may not exist yet)')
+    const { data, error } = await supabase
+      .from('campaigns')
+      .select('*')
+      .eq('gm_id', user.id)
+      .order('created_at', { ascending: false })
+
+    if (error) {
+      console.error('Error fetching campaigns:', error)
+    } else {
+      campaigns = data
+    }
   }
 
   return (
