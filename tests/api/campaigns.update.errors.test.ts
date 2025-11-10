@@ -20,15 +20,19 @@ describe('PATCH /api/campaigns/:id - error cases', () => {
     jest.resetAllMocks()
   })
 
-  test('returns 403 when authenticated but not owner', async () => {
-    const existingCampaign = { id: 'camp-1', gm_id: 'user-2', name: 'Old', party_level: 3 }
-    const { fakeSupabase } = createFakeSupabase({ userId: 'user-1', singleResponses: [{ data: existingCampaign, error: null }] })
+  test('returns 404 when authenticated but not a member', async () => {
+    const membership = { data: null, error: { message: 'Not found' } } // Not a member
+    const { fakeSupabase } = createFakeSupabase({ 
+      userId: 'user-1', 
+      singleResponses: [membership] 
+    })
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
     const req: any = { json: async () => ({ name: 'New Name', party_level: 5 }) }
     const res = await PATCH(req, { params: { id: 'camp-1' } } as any)
 
-    expect((res as any).status).toBe(403)
+    // Returns 404 to avoid revealing campaign existence to non-members
+    expect((res as any).status).toBe(404)
   })
 
   test('returns 404 when campaign not found', async () => {
@@ -42,8 +46,14 @@ describe('PATCH /api/campaigns/:id - error cases', () => {
   })
 
   test('returns 500 when DB returns an error', async () => {
+    const membershipData = { campaign_id: 'camp-1', user_id: 'user-1', role: 'owner' }
     const existingCampaign = { id: 'camp-1', gm_id: 'user-1', name: 'Old', party_level: 3 }
-    const singleResponses: any[] = [{ data: existingCampaign, error: null }, { data: null, error: { message: 'DB failure' } }]
+    // Responses: membership check succeeds, campaign fetch succeeds, update fails
+    const singleResponses: any[] = [
+      { data: membershipData, error: null },
+      { data: existingCampaign, error: null },
+      { data: null, error: { message: 'DB failure' } }
+    ]
     const { fakeSupabase } = createFakeSupabase({ userId: 'user-1', singleResponses })
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 

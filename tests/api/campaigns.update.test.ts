@@ -39,8 +39,14 @@ describe('PATCH /api/campaigns/:id', () => {
   test('updates campaign when authenticated owner', async () => {
     const existingCampaign = { id: 'camp-1', gm_id: 'user-1', name: 'Old', party_level: 3 }
     const updatedCampaign = { id: 'camp-1', gm_id: 'user-1', name: 'New Name', party_level: 5 }
+    const membershipData = { campaign_id: 'camp-1', user_id: 'user-1', role: 'owner' }
 
-    const singleResponses: any[] = [{ data: existingCampaign }, { data: updatedCampaign }]
+    // Need 3 single() responses: 1 for membership check, 1 for campaign fetch, 1 for update result
+    const singleResponses: any[] = [
+      { data: membershipData },  // First: membership check
+      { data: existingCampaign }, // Second: campaign fetch (for validation)
+      { data: updatedCampaign }   // Third: update result
+    ]
     const { fakeSupabase, chain } = createFakeSupabase({ userId: 'user-1', singleResponses })
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 

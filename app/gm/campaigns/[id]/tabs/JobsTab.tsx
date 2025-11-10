@@ -2,6 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Edit } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import type { Job, Organization, MissionType } from '@/types/database'
 
@@ -72,12 +74,21 @@ export default function JobsTab({ campaignId, jobs, organizations, missionTypes 
                     </span>
                     {job.reward && <span className="text-gray-600">💰 {job.reward}</span>}
                   </div>
-                  <button
-                    onClick={() => router.push(`/gm/campaigns/${campaignId}/jobs/${job.id}`)}
-                    className="text-blue-600 hover:text-blue-800 font-medium"
-                  >
-                    View Details →
-                  </button>
+                  <div className="flex items-center gap-2">
+                    <Link
+                      href={`/gm/campaigns/${campaignId}/jobs/${job.id}/edit`}
+                      className="inline-flex items-center gap-1 px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-md"
+                    >
+                      <Edit className="h-3 w-3" />
+                      <span className="text-xs font-medium">Edit</span>
+                    </Link>
+                    <button
+                      onClick={() => router.push(`/gm/campaigns/${campaignId}/jobs/${job.id}`)}
+                      className="text-blue-600 hover:text-blue-800 font-medium"
+                    >
+                      View Details →
+                    </button>
+                  </div>
                 </div>
               </div>
             )
