@@ -3,7 +3,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "24"
 
 # Exclude NEXT_PUBLIC_ env vars from secrets scanning (they are public by design)
 [functions]
