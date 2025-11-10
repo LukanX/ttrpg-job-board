@@ -143,7 +143,7 @@ export default async function CampaignPage({ params }: PageProps) {
                 {campaign.share_code}
               </p>
               <a
-                href={`${process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000'}/share/${campaign.share_code}`}
+                href={`${process.env.NEXT_PUBLIC_APP_URL}/share/${campaign.share_code}`}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-xs text-blue-600 hover:text-blue-800"

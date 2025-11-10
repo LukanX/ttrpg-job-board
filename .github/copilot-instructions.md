@@ -264,7 +264,7 @@ GROQ_API_KEY=your_groq_key
 GOOGLE_AI_API_KEY=your_gemini_key
 
 # App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
+NEXT_PUBLIC_APP_URL=<your_app_url>
 ```
 
 ## Development Workflow
