@@ -1,18 +1,36 @@
 // Shared helpers to create fake Supabase clients and query chains for tests
-export function createChain(singleResponses: any[] = []) {
-  return {
+
+export type SupabaseRow<T = any> = { data: T | null; error: any | null }
+
+export type SupabaseChain<T = any> = {
+  select: jest.MockedFunction<() => any>
+  eq: jest.MockedFunction<() => any>
+  update: jest.MockedFunction<() => any>
+  insert: jest.MockedFunction<() => any>
+  single: jest.Mock<Promise<SupabaseRow<T>>, []>
+}
+
+export function createChain<T = any>(singleResponses: Array<SupabaseRow<T>> = []): SupabaseChain<T> {
+  const chain: any = {
     select: jest.fn().mockReturnThis(),
     eq: jest.fn().mockReturnThis(),
     update: jest.fn().mockReturnThis(),
     insert: jest.fn().mockReturnThis(),
     single: jest.fn().mockImplementation(() => Promise.resolve(singleResponses.shift())),
   }
+
+  return chain as SupabaseChain<T>
 }
 
-export function createFakeSupabase({ userId = null, singleResponses = [] }: { userId?: string | null; singleResponses?: any[] } = {}) {
-  const chain = createChain(singleResponses)
+export type FakeSupabase<T = any> = {
+  auth: { getUser: jest.Mock<Promise<{ data: { user: { id: string } } | null; error: any }>, []> }
+  from: jest.MockedFunction<(table: string) => SupabaseChain<T>>
+}
 
-  const fakeSupabase: any = {
+export function createFakeSupabase<T = any>({ userId = null, singleResponses = [] }: { userId?: string | null; singleResponses?: Array<SupabaseRow<T>> } = {}) {
+  const chain = createChain<T>(singleResponses)
+
+  const fakeSupabase: FakeSupabase<T> = {
     auth: { getUser: jest.fn().mockResolvedValue({ data: { user: userId ? { id: userId } : null }, error: null }) },
     from: jest.fn().mockReturnValue(chain),
   }

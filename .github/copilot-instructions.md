@@ -38,6 +38,8 @@ This is an LLM-powered job board for TTRPGs, with the MVP being focused on Starf
 - Use test doubles (mocks, stubs, spies) appropriately
 - Implement integration tests for API endpoints and user flows
 - Keep tests fast, isolated, and deterministic
+ - Use typed test helpers for common patterns (e.g., `tests/helpers/consoleSpy.ts`) to standardize mocks/spies and keep tests quiet while allowing assertions on logs
+ - Prefer asserting on logged errors (with a spy) rather than only silencing them when the log is part of the behavior under test
 
 ## AI Code Generation Preferences
 
