@@ -24,6 +24,7 @@
     "clsx": "^2.1.0",
     "tailwind-merge": "^2.5.0",
     "lucide-react": "^0.445.0",
+    "@sendgrid/mail": "^8.1.6",
   "openai": "^6.0.0",
     "nanoid": "^5.0.0"
   },

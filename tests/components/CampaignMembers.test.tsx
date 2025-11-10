@@ -92,9 +92,7 @@ describe('CampaignMembers component', () => {
   // PATCH response
   mf.mockResolvedValueOnce({ ok: true, json: async () => ({ member: membersAfter[1] }) })
 
-    // stub confirm to accept
-    const origConfirm = (global as any).confirm
-    ;(global as any).confirm = jest.fn().mockReturnValue(true)
+  // no native confirm; component shows accessible modal instead
 
     render(<CampaignMembers campaignId="camp-1" userRole="owner" canManage={true} />)
 
@@ -104,14 +102,12 @@ describe('CampaignMembers component', () => {
     const select = screen.getAllByDisplayValue('co-gm')[0]
     fireEvent.change(select, { target: { value: 'viewer' } })
 
-  // Narrow the assertion to the specific member row for U2 to avoid ambiguous matches
-  const userNode = screen.getByText('U2')
-  const memberRow = userNode.closest('div.flex.items-center.justify-between') as HTMLElement
-  await waitFor(() => expect((useRouter() as any).refresh).toHaveBeenCalled())
-  expect(global.fetch).toHaveBeenCalledTimes(2)
+    // Confirm modal should be visible; click confirm to perform PATCH
+    const confirmBtn = await screen.findByTestId('confirm-modal-confirm')
+    fireEvent.click(confirmBtn)
 
-    // restore confirm
-    ;(global as any).confirm = origConfirm
+    await waitFor(() => expect((useRouter() as any).refresh).toHaveBeenCalled())
+    expect(global.fetch).toHaveBeenCalledTimes(2)
   })
 
   test('remove flow prompts and removes member from list', async () => {
@@ -127,9 +123,7 @@ describe('CampaignMembers component', () => {
   // DELETE response
   mf.mockResolvedValueOnce({ ok: true, json: async () => ({ message: 'Member removed successfully' }) })
 
-    // stub confirm to accept
-    const origConfirm = (global as any).confirm
-    ;(global as any).confirm = jest.fn().mockReturnValue(true)
+  // no native confirm; component shows accessible modal instead
 
     render(<CampaignMembers campaignId="camp-1" userRole="owner" canManage={true} />)
 
@@ -139,10 +133,11 @@ describe('CampaignMembers component', () => {
     const removeButtons = screen.getAllByText(/remove/i)
     fireEvent.click(removeButtons[0])
 
-  await waitFor(() => expect((useRouter() as any).refresh).toHaveBeenCalled())
-  expect(global.fetch).toHaveBeenCalledTimes(2)
+    // Click confirm in modal
+    const confirmBtn = await screen.findByTestId('confirm-modal-confirm')
+    fireEvent.click(confirmBtn)
 
-    // restore confirm
-    ;(global as any).confirm = origConfirm
+    await waitFor(() => expect((useRouter() as any).refresh).toHaveBeenCalled())
+    expect(global.fetch).toHaveBeenCalledTimes(2)
   })
 })

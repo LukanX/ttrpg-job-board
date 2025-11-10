@@ -98,6 +98,15 @@ export default async function CampaignPage({ params }: PageProps) {
   const membersList = members || []
   const membersCount = membersList.length
 
+  // Fetch pending invitations for display in Members tab
+  const { data: invitations } = await supabase
+    .from('campaign_invitations')
+    .select('id, email, role, token, accepted, created_at')
+    .eq('campaign_id', id)
+    .order('created_at', { ascending: true })
+
+  const invitationsList = invitations || []
+
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
@@ -155,6 +164,7 @@ export default async function CampaignPage({ params }: PageProps) {
           canManage={canManageMembers}
           membersCount={membersCount}
           initialMembers={membersList}
+          initialInvitations={invitationsList}
         />
       </div>
     </div>

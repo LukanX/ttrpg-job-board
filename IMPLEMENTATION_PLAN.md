@@ -216,6 +216,7 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - [ ] Add database indexes for common queries
 - [ ] Implement database backups
 - [ ] Add soft delete for important entities
+ - [ ] Add invitation expiry and cleanup: add an `expires_at` column to `campaign_invitations`, set sensible defaults (e.g., 30 days), and add a scheduled cleanup job or retention policy to remove/archive expired invites.
 
 ### Security
 - [ ] Rate limiting on API routes
