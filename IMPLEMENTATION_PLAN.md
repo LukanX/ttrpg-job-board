@@ -229,7 +229,7 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - [ ] Create deployment guide
 - [ ] Environment variable documentation
 - [ ] Production database setup guide
-- [ ] Vercel deployment configuration
+- ✅ Netlify deployment configuration
 - [ ] CI/CD pipeline (GitHub Actions)
 
 ---
