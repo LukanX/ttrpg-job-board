@@ -9,12 +9,14 @@ export async function sendInviteEmail(email: string, token: string, campaignName
     const sg = await import('@sendgrid/mail')
     sg.default.setApiKey(process.env.SENDGRID_API_KEY!)
 
-    const url = `${process.env.NEXT_PUBLIC_APP_URL || ''}/invite?token=${encodeURIComponent(token)}`
+    // Use a path-style link which is more robust against email forwarding/tracking
+    const base = process.env.NEXT_PUBLIC_APP_URL || ''
+    const urlPath = `${base.replace(/\/$/, '')}/invite/${encodeURIComponent(token)}`
     const from = process.env.EMAIL_FROM || 'no-reply@localhost'
     const subject = `Invitation to join ${campaignName ?? 'a campaign'}`
     const html = `
       <p>You were invited to join <strong>${campaignName ?? 'a campaign'}</strong>.</p>
-      <p>Click <a href="${url}">here to accept the invitation</a>.</p>
+      <p>Click <a href="${urlPath}">here to accept the invitation</a>.</p>
       <p>If you don't have an account yet, signing up will automatically add you to the campaign.</p>
     `
 

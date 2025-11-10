@@ -5,12 +5,8 @@ import React from 'react'
 import { createClient } from '@/lib/supabase/server'
 import AcceptInviteButton from '@/components/AcceptInviteButton'
 
-type Props = {
-  searchParams?: { token?: string }
-}
-
-export default async function InvitePage({ searchParams }: Props) {
-  const token = searchParams?.token
+export default async function InviteTokenPage({ params }: { params: Promise<{ token: string }> }) {
+  const { token } = await params
 
   if (!token) {
     return (
@@ -68,21 +64,14 @@ export default async function InvitePage({ searchParams }: Props) {
           {invData.expires_at && new Date(invData.expires_at) < new Date() && (
             <p className="text-sm mt-2 text-red-700">This invitation has expired and can no longer be used.</p>
           )}
-          {invData.accepted && <p className="text-sm mt-2 text-green-700">This invitation has already been accepted.</p>}
         </div>
 
         <div className="space-y-3">
           <p className="text-sm text-gray-700">To accept, create an account using the same email address, or sign in if you already have an account.</p>
 
           {currentUser && currentUser.email === invData.email && !invData.accepted && !(invData.expires_at && new Date(invData.expires_at) < new Date()) ? (
-            // Client-side button to POST accept
-            <div>
-              {/* dynamically load client component */}
-              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
-              <script type="module" />
-              <div id="accept-cta">
-                <AcceptInviteButton token={token} />
-              </div>
+            <div id="accept-cta">
+              <AcceptInviteButton token={token} />
             </div>
           ) : (
             <div className="flex gap-3">
