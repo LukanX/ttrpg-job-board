@@ -51,6 +51,10 @@ export default async function CampaignPage({ params }: PageProps) {
     notFound()
   }
 
+  // Determine user role: membership preferred, fallback to gm_id owner
+  const userRole = membership?.role ?? (campaign.gm_id === user.id ? 'owner' : null)
+  const canManageMembers = userRole === 'owner'
+
   // Fetch related data
   const { data: organizations } = await supabase
     .from('organizations')
@@ -69,6 +73,30 @@ export default async function CampaignPage({ params }: PageProps) {
     .select('*')
     .eq('campaign_id', id)
     .order('created_at', { ascending: false })
+
+  // Fetch member count for the Members tab (server-side) so the tab shows an immediate count
+  // Also fetch the full members list server-side so we can pass initial data to the client
+  const { data: members } = await supabase
+    .from('campaign_members')
+    .select(
+      `
+      id,
+      campaign_id,
+      user_id,
+      role,
+      created_at,
+      users:user_id (
+        id,
+        email,
+        display_name
+      )
+    `
+    )
+    .eq('campaign_id', id)
+    .order('created_at', { ascending: true })
+
+  const membersList = members || []
+  const membersCount = membersList.length
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -117,12 +145,16 @@ export default async function CampaignPage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Tabs */}
+        {/* Tabs (Members tab now included) */}
         <CampaignTabs
           campaignId={id}
           organizations={organizations || []}
           missionTypes={missionTypes || []}
           jobs={jobs || []}
+          userRole={userRole as any}
+          canManage={canManageMembers}
+          membersCount={membersCount}
+          initialMembers={membersList}
         />
       </div>
     </div>

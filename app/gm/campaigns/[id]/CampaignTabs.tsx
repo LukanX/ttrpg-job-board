@@ -5,28 +5,35 @@ import type { Organization, MissionType, Job } from '@/types/database'
 import OrganizationsTab from './tabs/OrganizationsTab'
 import MissionTypesTab from './tabs/MissionTypesTab'
 import JobsTab from './tabs/JobsTab'
+import CampaignMembers from '@/components/gm/CampaignMembers'
 
 interface Props {
   campaignId: string
   organizations: Organization[]
   missionTypes: MissionType[]
   jobs: Job[]
+  initialMembers?: any[]
 }
 
-type TabType = 'jobs' | 'organizations' | 'mission-types'
+type TabType = 'jobs' | 'organizations' | 'mission-types' | 'members'
 
 export default function CampaignTabs({
   campaignId,
   organizations,
   missionTypes,
   jobs,
-}: Props) {
+  initialMembers,
+  userRole,
+  canManage,
+  membersCount,
+}: Props & { userRole?: 'owner' | 'co-gm' | 'viewer' | null; canManage?: boolean; membersCount?: number }) {
   const [activeTab, setActiveTab] = useState<TabType>('jobs')
 
   const tabs = [
     { id: 'jobs' as TabType, name: 'Jobs', count: jobs.length },
     { id: 'organizations' as TabType, name: 'Organizations', count: organizations.length },
     { id: 'mission-types' as TabType, name: 'Mission Types', count: missionTypes.length },
+    { id: 'members' as TabType, name: 'Members', count: membersCount ?? 0 },
   ]
 
   return (
@@ -71,6 +78,14 @@ export default function CampaignTabs({
         )}
         {activeTab === 'mission-types' && (
           <MissionTypesTab campaignId={campaignId} missionTypes={missionTypes} />
+        )}
+        {activeTab === 'members' && (
+          <CampaignMembers
+            campaignId={campaignId}
+            userRole={userRole as any}
+            canManage={!!canManage}
+            initialMembers={initialMembers}
+          />
         )}
       </div>
     </div>
