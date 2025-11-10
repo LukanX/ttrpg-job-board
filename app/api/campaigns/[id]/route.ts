@@ -8,8 +8,9 @@ const PatchCampaignSchema = z.object({
   settings: z.any().optional(),
 })
 
-export async function PATCH(request: NextRequest, { params }: { params: { id?: string } }) {
+export async function PATCH(request: NextRequest, context: any) {
   try {
+    const params = context?.params
     const id = params?.id
     // If params isn't provided for some reason, try to extract id from the request URL as a fallback
     const fallbackId = (request as any)?.nextUrl?.pathname?.split('/')?.pop()
