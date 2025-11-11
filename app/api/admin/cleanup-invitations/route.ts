@@ -33,8 +33,8 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    // Call the cleanup function
-    const { data, error } = await supabaseAdmin.rpc('run_invitation_cleanup')
+  // Call the cleanup function
+  const { error } = await supabaseAdmin.rpc('run_invitation_cleanup')
 
     if (error) {
       console.error('Cleanup error:', error)

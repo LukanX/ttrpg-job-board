@@ -70,23 +70,25 @@ export default function CampaignMembers({
 			}
 			const json = await res.json()
 			setMembers(json.members || [])
-		} catch (err: any) {
-			setError(err?.message || 'Error')
-			setMembers([])
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err ?? 'Error')
+				setError(msg)
+				setMembers([])
 		} finally {
 			setLoading(false)
 		}
 	}, [campaignId])
 
 	const fetchInvitations = useCallback(async () => {
-		try {
-			const res = await fetch(`/api/campaigns/${campaignId}/invitations`)
-			if (!res.ok) return setInvitations([])
-			const json = await res.json()
-			setInvitations(json.invitations || [])
-		} catch {
-			setInvitations([])
-		}
+				try {
+					const res = await fetch(`/api/campaigns/${campaignId}/invitations`)
+					if (!res.ok) return setInvitations([])
+					const json = await res.json()
+					setInvitations(json.invitations || [])
+					} catch (err: unknown) {
+					void err
+					setInvitations([])
+			}
 	}, [campaignId])
 
 		useEffect(() => {
@@ -121,8 +123,9 @@ export default function CampaignMembers({
 			setInviteRole('co-gm')
 			// refresh server-provided data
 			refresh()
-		} catch (err: any) {
-			setError(err?.message || 'Invite failed')
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err ?? 'Invite failed')
+				setError(msg)
 		} finally {
 			setSubmitting(false)
 		}
@@ -151,8 +154,9 @@ export default function CampaignMembers({
 			const body = await res.json().catch(() => ({}))
 			if (!res.ok) throw new Error(body.error || 'Failed to update role')
 			refresh()
-		} catch (err: any) {
-			setError(err?.message || 'Update failed')
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err ?? 'Update failed')
+				setError(msg)
 		} finally {
 			setSubmitting(false)
 			setModalTargetId(null)
@@ -179,8 +183,9 @@ export default function CampaignMembers({
 			const body = await res.json().catch(() => ({}))
 			if (!res.ok) throw new Error(body.error || 'Failed to remove member')
 			refresh()
-		} catch (err: any) {
-			setError(err?.message || 'Remove failed')
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err ?? 'Remove failed')
+				setError(msg)
 		} finally {
 			setSubmitting(false)
 			setModalTargetId(null)
@@ -208,8 +213,9 @@ export default function CampaignMembers({
 			if (!res.ok) throw new Error(body.error || 'Failed to resend invite')
 			// refresh list
 			fetchInvitations()
-		} catch (err: any) {
-			setError(err?.message || 'Resend failed')
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err ?? 'Resend failed')
+				setError(msg)
 		} finally {
 			setSubmitting(false)
 			setModalTargetId(null)
@@ -235,8 +241,9 @@ export default function CampaignMembers({
 			const body = await res.json().catch(() => ({}))
 			if (!res.ok) throw new Error(body.error || 'Failed to revoke invite')
 			fetchInvitations()
-		} catch (err: any) {
-			setError(err?.message || 'Revoke failed')
+			} catch (err: unknown) {
+				const msg = err instanceof Error ? err.message : String(err ?? 'Revoke failed')
+				setError(msg)
 		} finally {
 			setSubmitting(false)
 			setModalTargetId(null)

@@ -7,6 +7,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import { createClient } from '@/lib/supabase/client'
 import { useRouter } from 'next/navigation'
 import { nanoid } from 'nanoid'
+import type { Campaign } from '@/types/database'
 
 const CampaignSchema = z.object({
   name: z.string().min(1, 'Campaign name is required'),
@@ -20,7 +21,7 @@ export default function CampaignForm({
   onSuccess,
 }: {
   campaign?: { id: string; name: string; party_level: number }
-  onSuccess?: (updated?: any) => void
+  onSuccess?: (updated?: Partial<Campaign>) => void
 }) {
   const router = useRouter()
   const supabase = createClient()
@@ -67,7 +68,7 @@ export default function CampaignForm({
         }
 
         const json = await res.json()
-        onSuccess && onSuccess(json.campaign)
+        if (onSuccess) onSuccess(json.campaign)
         router.push(`/gm/campaigns/${campaign.id}`)
         router.refresh()
       } else {
@@ -91,9 +92,9 @@ export default function CampaignForm({
           .select()
           .single()
 
-        if (error) throw error
+  if (error) throw error
 
-        onSuccess && onSuccess(data)
+  if (onSuccess) onSuccess(data)
         router.push(`/gm/campaigns/${data.id}`)
         router.refresh()
       }

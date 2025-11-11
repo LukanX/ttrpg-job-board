@@ -6,7 +6,7 @@ describe('supabaseMock helpers', () => {
   })
 
   test('createChain returns a chain whose single() yields provided responses in order', async () => {
-    const responses: Array<SupabaseRow<any>> = [
+    const responses: Array<SupabaseRow<Record<string, unknown>>> = [
       { data: { id: 'one' }, error: null },
       { data: { id: 'two' }, error: null },
     ]

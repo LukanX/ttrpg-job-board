@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react'
 // Mock nanoid (ESM) which Jest can't parse from node_modules
 jest.mock('nanoid', () => ({ nanoid: () => 'fixedshare' }))

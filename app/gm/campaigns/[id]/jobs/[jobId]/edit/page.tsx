@@ -1,5 +1,6 @@
 import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
+import Link from 'next/link'
 import JobForm from '@/components/gm/JobForm'
 import type { Job, Organization, MissionType } from '@/types/database'
 
@@ -62,7 +63,7 @@ export default async function EditJobPage({ params }: Props) {
           <div className="bg-red-50 border border-red-200 rounded-lg p-6">
             <h1 className="text-xl font-semibold text-red-900 mb-2">Access Denied</h1>
             <p className="text-red-700">
-              You don't have permission to edit this job. Only the job creator, campaign owner, or co-GMs can edit jobs.
+              You don&apos;t have permission to edit this job. Only the job creator, campaign owner, or co-GMs can edit jobs.
             </p>
           </div>
         </div>
@@ -91,12 +92,12 @@ export default async function EditJobPage({ params }: Props) {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
-          <a
+          <Link
             href={`/gm/campaigns/${campaignId}/jobs/${jobId}`}
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             ← Back to Job
-          </a>
+          </Link>
         </div>
 
         <h1 className="text-3xl font-bold text-gray-900 mb-8">Edit Job</h1>

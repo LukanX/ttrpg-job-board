@@ -1,4 +1,4 @@
-export default {
+const config = {
   preset: 'ts-jest',
   testEnvironment: 'jest-environment-jsdom',
   moduleNameMapper: {
@@ -8,3 +8,5 @@ export default {
   setupFilesAfterEnv: ['<rootDir>/jest.setup.ts'],
   testPathIgnorePatterns: ['/node_modules/', '/.next/'],
 }
+
+export default config

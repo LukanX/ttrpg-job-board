@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import type { Organization } from '@/types/database'
 import ConfirmModal from '@/components/ui/ConfirmModal'
 import EditOrganizationModal from '@/components/gm/EditOrganizationModal'
@@ -20,7 +19,7 @@ export default function OrganizationsTab({ campaignId, organizations }: Props) {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const router = useRouter()
-  const supabase = createClient()
+  
   const [editingOrg, setEditingOrg] = useState<Organization | null>(null)
   const [editModalOpen, setEditModalOpen] = useState(false)
   const [confirmOpen, setConfirmOpen] = useState(false)
@@ -38,11 +37,12 @@ export default function OrganizationsTab({ campaignId, organizations }: Props) {
         body: JSON.stringify({ name, description: description || null, faction_type: factionType || null }),
       })
 
-      let bodyResp: any = {}
+      let bodyResp: unknown = {}
       try { bodyResp = await res.json() } catch {}
 
       if (!res.ok) {
-        throw new Error(bodyResp?.error || `Failed to create organization (status ${res.status})`)
+        const maybeErr = bodyResp && typeof bodyResp === 'object' && 'error' in bodyResp ? (bodyResp as Record<string, unknown>)['error'] : undefined
+        throw new Error((typeof maybeErr === 'string' ? maybeErr : undefined) || `Failed to create organization (status ${res.status})`)
       }
 
       setName('')
@@ -195,11 +195,12 @@ export default function OrganizationsTab({ campaignId, organizations }: Props) {
               method: 'DELETE',
             })
 
-            let body: any = {}
+            let body: unknown = {}
             try { body = await res.json() } catch {}
 
             if (!res.ok) {
-              throw new Error(body?.error || `Delete failed (status ${res.status})`)
+              const maybeErr = body && typeof body === 'object' && 'error' in body ? (body as Record<string, unknown>)['error'] : undefined
+              throw new Error((typeof maybeErr === 'string' ? maybeErr : undefined) || `Delete failed (status ${res.status})`)
             }
 
             setConfirmOpen(false)

@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import type { MissionType } from '@/types/database'
 import EditMissionTypeModal from '@/components/gm/EditMissionTypeModal'
 import DeleteMissionTypeButton from '@/components/gm/DeleteMissionTypeButton'
@@ -22,7 +21,7 @@ export default function MissionTypesTab({ campaignId, missionTypes }: Props) {
   const [error, setError] = useState<string | null>(null)
   const [editing, setEditing] = useState<null | MissionType>(null)
   const router = useRouter()
-  const supabase = createClient()
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

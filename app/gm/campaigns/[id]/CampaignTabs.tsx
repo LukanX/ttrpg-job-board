@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import type { Organization, MissionType, Job } from '@/types/database'
+import type { Organization, MissionType, Job, CampaignMember, CampaignMemberRole } from '@/types/database'
 import OrganizationsTab from './tabs/OrganizationsTab'
 import MissionTypesTab from './tabs/MissionTypesTab'
 import JobsTab from './tabs/JobsTab'
@@ -12,8 +12,17 @@ interface Props {
   organizations: Organization[]
   missionTypes: MissionType[]
   jobs: Job[]
-  initialMembers?: any[]
-  initialInvitations?: any[]
+  initialMembers?: CampaignMember[]
+  // Invitation shape expected by CampaignMembers component
+  initialInvitations?: Array<{
+    id: string
+    email: string
+    role: 'co-gm' | 'viewer'
+    token?: string
+    accepted?: boolean
+    created_at?: string
+    expires_at?: string
+  }>
 }
 
 type TabType = 'jobs' | 'organizations' | 'mission-types' | 'members'
@@ -84,7 +93,7 @@ export default function CampaignTabs({
         {activeTab === 'members' && (
           <CampaignMembers
             campaignId={campaignId}
-            userRole={userRole as any}
+            userRole={userRole as CampaignMemberRole | null}
             canManage={!!canManage}
             initialMembers={initialMembers}
             initialInvitations={initialInvitations}

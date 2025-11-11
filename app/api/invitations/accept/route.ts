@@ -122,12 +122,14 @@ export async function POST(request: NextRequest) {
 
     if (insertError) {
       // Check if it's a duplicate (user already a member)
-      if ((insertError as any).code === '23505') {
+      const ie = insertError as unknown as Record<string, unknown>
+      if (typeof ie?.code === 'string' && ie.code === '23505') {
         console.log('User already a member, continuing to mark invitation accepted')
       } else {
         console.error('Failed to add campaign member:', insertError)
+        const msg = typeof ie?.message === 'string' ? ie.message : String(insertError)
         return NextResponse.json({
-          error: `Failed to add member to campaign: ${(insertError as any).message ?? String(insertError)}`,
+          error: `Failed to add member to campaign: ${msg}`,
         }, { status: 500 })
       }
     }
@@ -142,8 +144,10 @@ export async function POST(request: NextRequest) {
 
     if (updateErr) {
       console.error('Failed to mark invitation accepted:', updateErr)
+      const ue = updateErr as unknown as Record<string, unknown>
+      const msg = typeof ue?.message === 'string' ? ue.message : String(updateErr)
       return NextResponse.json({
-        error: `Failed to mark invitation as accepted: ${(updateErr as any).message ?? String(updateErr)}`,
+        error: `Failed to mark invitation as accepted: ${msg}`,
       }, { status: 500 })
     }
 

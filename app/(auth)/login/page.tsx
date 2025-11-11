@@ -31,11 +31,13 @@ export default function LoginPage() {
       }
 
       // Check if user profile exists, create if not
-      let { data: userData, error: userError } = await supabase
+      const { data: initialUserData, error: initialUserError } = await supabase
         .from('users')
         .select('role')
         .eq('id', data.user.id)
         .single()
+      let userData = initialUserData
+      const userError = initialUserError
 
       // If user profile doesn't exist, create it
       if (userError && userError.code === 'PGRST116') {

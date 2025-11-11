@@ -1,6 +1,7 @@
 /**
  * Direct Gemini API test - minimal diagnostic script to identify the correct endpoint
  */
+/* eslint-disable @typescript-eslint/no-require-imports */
 const fs = require('fs')
 const path = require('path')
 
@@ -39,7 +40,7 @@ async function testEndpoint(url, body, headers) {
       try {
         const json = JSON.parse(text)
         console.log('Response:', JSON.stringify(json, null, 2))
-      } catch (e) {
+      } catch {
         console.log('Response (text):', text)
       }
       return true

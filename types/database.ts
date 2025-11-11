@@ -14,7 +14,7 @@ export interface Campaign {
   name: string
   party_level: number
   share_code: string
-  settings: Record<string, any>
+  settings: Record<string, unknown>
   created_at: string
   updated_at: string
 }
@@ -50,7 +50,7 @@ export interface Job {
   reward: string | null
   status: 'active' | 'completed' | 'archived'
   gm_notes: string | null
-  llm_raw_response: Record<string, any> | null
+  llm_raw_response: Record<string, unknown> | null
   created_by: string
   created_at: string
   updated_at: string
@@ -61,7 +61,7 @@ export interface Encounter {
   job_id: string
   encounter_type: string
   description: string
-  enemies: Record<string, any> | null
+  enemies: Record<string, unknown> | null
   challenge_rating: number | null
   created_at: string
   updated_at: string
@@ -73,7 +73,7 @@ export interface NPC {
   name: string
   role: string | null
   personality: string | null
-  stats_block: Record<string, any> | null
+  stats_block: Record<string, unknown> | null
   created_at: string
   updated_at: string
 }

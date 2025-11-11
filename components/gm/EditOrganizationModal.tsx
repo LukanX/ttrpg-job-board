@@ -1,7 +1,7 @@
 "use client"
 
 import React, { useEffect, useState } from 'react'
-import ConfirmModal from '@/components/ui/ConfirmModal'
+// ConfirmModal isn't used in this modal; remove import to satisfy linter
 import type { Organization } from '@/types/database'
 
 type Props = {
@@ -50,11 +50,12 @@ export default function EditOrganizationModal({ isOpen, organization, onClose, o
                 body: JSON.stringify({ orgId: organization.id, name, description: description || null, faction_type: factionType || null }),
               })
 
-              let body: any = {}
+              let body: unknown = {}
               try { body = await res.json() } catch {}
 
               if (!res.ok) {
-                throw new Error(body?.error || `Update failed (status ${res.status})`)
+                const maybeErr = body && typeof body === 'object' && 'error' in body ? (body as Record<string, unknown>)['error'] : undefined
+                throw new Error((typeof maybeErr === 'string' ? maybeErr : undefined) || `Update failed (status ${res.status})`)
               }
 
               onSaved()

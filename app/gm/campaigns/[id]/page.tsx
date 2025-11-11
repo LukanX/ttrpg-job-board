@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Edit } from 'lucide-react'
-import type { Campaign, Organization, MissionType, Job } from '@/types/database'
+import type { CampaignMemberRole } from '@/types/database'
 import CampaignTabs from './CampaignTabs'
 
 interface PageProps {
@@ -156,12 +156,12 @@ export default async function CampaignPage({ params }: PageProps) {
         </div>
 
         {/* Tabs (Members tab now included) */}
-        <CampaignTabs
+      <CampaignTabs
           campaignId={id}
           organizations={organizations || []}
           missionTypes={missionTypes || []}
           jobs={jobs || []}
-          userRole={userRole as any}
+        userRole={userRole as CampaignMemberRole | null}
           canManage={canManageMembers}
           membersCount={membersCount}
           initialMembers={membersList}

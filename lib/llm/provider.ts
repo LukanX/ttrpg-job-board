@@ -8,7 +8,7 @@ export type GenerateResult = {
   provider: string
   model?: string
   text: string
-  raw?: any
+  raw?: unknown
 }
 
 export type ProviderName = 'openai' | 'gemini'

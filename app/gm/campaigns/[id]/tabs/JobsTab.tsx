@@ -1,10 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Edit } from 'lucide-react'
-import { createClient } from '@/lib/supabase/client'
 import type { Job, Organization, MissionType } from '@/types/database'
 
 interface Props {

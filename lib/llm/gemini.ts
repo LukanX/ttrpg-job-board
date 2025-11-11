@@ -34,16 +34,18 @@ export async function generateJobGemini(
   const url = `${base}/models/${encodeURIComponent(model)}:generateContent${apiKey ? `?key=${encodeURIComponent(apiKey)}` : ''}`
 
   // Request body for the current Gemini API (v1beta)
-  const body: any = {
-    contents: [{
-      parts: [{ text: prompt }]
-    }],
+  const body: Record<string, unknown> = {
+    contents: [
+      {
+        parts: [{ text: prompt }],
+      },
+    ],
     generationConfig: {
       temperature: options.temperature ?? 0.7,
       // Allow overriding via options or env var; default to 2000 for fuller outputs
       maxOutputTokens: options.maxTokens ?? Number(process.env.GOOGLE_GEMINI_MAX_TOKENS ?? '2000'),
       responseMimeType: 'application/json',
-    }
+    },
   }
 
   const headers: Record<string, string> = {
@@ -73,8 +75,22 @@ export async function generateJobGemini(
       const cand = json.candidates[0]
       
       // Modern Gemini API: content.parts[].text
-      if (cand?.content?.parts && Array.isArray(cand.content.parts)) {
-        text = cand.content.parts.map((p: any) => p?.text ?? '').join('')
+      if (cand && typeof cand === 'object') {
+        const c = cand as Record<string, unknown>
+        if (c.content && typeof c.content === 'object') {
+          const content = c.content as Record<string, unknown>
+          if (Array.isArray(content.parts)) {
+            text = content.parts
+              .map((p: unknown) => {
+                if (p && typeof p === 'object') {
+                  const part = p as Record<string, unknown>
+                  return typeof part.text === 'string' ? part.text : ''
+                }
+                return ''
+              })
+              .join('')
+          }
+        }
       }
       
       // Legacy fallback: output field
@@ -87,8 +103,9 @@ export async function generateJobGemini(
     if (!text) {
       text = json?.text
     }
-  } catch (err) {
+  } catch (_err) {
     // fall through to fallback
+    void _err
   }
 
   if (!text) text = JSON.stringify(json)
