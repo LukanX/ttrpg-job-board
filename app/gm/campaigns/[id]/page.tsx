@@ -85,6 +85,7 @@ export default async function CampaignPage({ params }: PageProps) {
       user_id,
       role,
       created_at,
+      updated_at,
       users:user_id (
         id,
         email,
