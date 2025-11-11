@@ -26,14 +26,52 @@ export default function LoginPage() {
 
       if (signInError) throw signInError
 
-      // Get user role to determine redirect
-      const { data: userData, error: userError } = await supabase
+      if (!data.user) {
+        throw new Error('No user data returned')
+      }
+
+      // Check if user profile exists, create if not
+      let { data: userData, error: userError } = await supabase
         .from('users')
         .select('role')
         .eq('id', data.user.id)
         .single()
 
-      if (userError) throw userError
+      // If user profile doesn't exist, create it
+      if (userError && userError.code === 'PGRST116') {
+        const displayName = data.user.user_metadata?.display_name || data.user.email?.split('@')[0] || 'User'
+        const role = data.user.user_metadata?.role || 'player'
+        
+        const { error: createError } = await supabase
+          .from('users')
+          .insert({
+            id: data.user.id,
+            email: data.user.email!,
+            display_name: displayName,
+            role: role,
+          })
+        
+        if (createError) {
+          console.error('Failed to create user profile:', createError)
+          throw new Error('Failed to create user profile. Please contact support.')
+        }
+        
+        // Fetch the newly created profile
+        const { data: newUserData, error: fetchError } = await supabase
+          .from('users')
+          .select('role')
+          .eq('id', data.user.id)
+          .single()
+        
+        if (fetchError) throw fetchError
+        userData = newUserData
+      } else if (userError) {
+        throw userError
+      }
+
+      if (!userData) {
+        throw new Error('Failed to load user profile')
+      }
 
       // Redirect based on role
       if (userData.role === 'gm') {

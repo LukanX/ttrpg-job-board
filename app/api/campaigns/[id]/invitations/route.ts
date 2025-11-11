@@ -35,6 +35,7 @@ export async function GET(
       .from('campaign_invitations')
       .select('id, email, role, accepted, created_at, expires_at')
       .eq('campaign_id', campaignId)
+      .eq('accepted', false) // Only show pending invitations
       .order('created_at', { ascending: false })
 
     if (error) {

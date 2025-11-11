@@ -60,7 +60,7 @@ export async function POST(request: NextRequest) {
       console.warn('campaign_members insert warning (non-fatal):', err)
     }
 
-    // Mark invitation accepted
+    // Mark invitation as accepted (soft delete - keeps audit trail)
     const updateRes = await supabase
       .from('campaign_invitations')
       .update({ accepted: true, invited_user_id: user.id, accepted_at: new Date().toISOString() })
