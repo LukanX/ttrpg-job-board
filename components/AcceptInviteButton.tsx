@@ -18,12 +18,29 @@ export default function AcceptInviteButton({ token }: { token: string }) {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ token }),
       })
-      const body = await res.json().catch(() => ({}))
-  if (!res.ok) throw new Error('Failed to accept invitation')
+      
+      let body
+      try {
+        body = await res.json()
+      } catch (jsonErr) {
+        console.error('Failed to parse JSON response:', jsonErr)
+        body = {}
+      }
+      
+      console.log('Accept invitation response:', { status: res.status, body })
+      
+      if (!res.ok) {
+        // Use the error message from the API response if available
+        const errorMsg = body.error || `Failed to accept invitation (Status: ${res.status})`
+        console.error('Accept invitation failed:', errorMsg)
+        throw new Error(errorMsg)
+      }
+      
       setSuccess(true)
       // Refresh so any server components update
       try { router.refresh() } catch {}
     } catch (err: any) {
+      console.error('Accept invitation error:', err)
       setError(err?.message || 'Failed')
     } finally {
       setLoading(false)
