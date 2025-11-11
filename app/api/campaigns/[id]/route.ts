@@ -8,14 +8,14 @@ const PatchCampaignSchema = z.object({
   settings: z.any().optional(),
 })
 
-export async function PATCH(request: NextRequest, { params }: { params: { id?: string } }) {
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
-    const id = params?.id
-    // If params isn't provided for some reason, try to extract id from the request URL as a fallback
-    const fallbackId = (request as any)?.nextUrl?.pathname?.split('/')?.pop()
-    const campaignId = id ?? fallbackId
+    const { id: campaignId } = await params
     if (!campaignId) {
-      console.error('PATCH /api/campaigns/:id - missing id', { params, url: (request as any)?.nextUrl?.pathname })
+      console.error('PATCH /api/campaigns/:id - missing id')
       return NextResponse.json({ error: 'Campaign id missing' }, { status: 400 })
     }
 
