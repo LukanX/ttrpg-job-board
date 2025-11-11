@@ -67,7 +67,43 @@ export async function POST(request: NextRequest) {
     }
 
     // Use service role to bypass RLS for adding member
-    const serviceClient = getServiceClient()
+    let serviceClient
+    try {
+      serviceClient = getServiceClient()
+    } catch (err) {
+      console.error('Failed to create service client:', err)
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+    }
+    
+    // Ensure user profile exists in public.users table before adding to campaign
+    // This handles the case where a user signed up but their profile wasn't created
+    const { data: existingProfile } = await serviceClient
+      .from('users')
+      .select('id')
+      .eq('id', user.id)
+      .single()
+    
+    if (!existingProfile) {
+      console.log('User profile does not exist, creating it now')
+      const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'
+      const role = user.user_metadata?.role || 'player'
+      
+      const { error: profileError } = await serviceClient
+        .from('users')
+        .insert({
+          id: user.id,
+          email: user.email!,
+          display_name: displayName,
+          role: role,
+        })
+      
+      if (profileError) {
+        console.error('Failed to create user profile:', profileError)
+        return NextResponse.json({ 
+          error: 'Failed to create user profile. Please contact support.' 
+        }, { status: 500 })
+      }
+    }
     
     // Add member (use service role to bypass RLS)
     const { error: insertError } = await serviceClient
@@ -84,7 +120,9 @@ export async function POST(request: NextRequest) {
         console.log('User already a member, continuing to mark invitation accepted')
       } else {
         console.error('Failed to add campaign member:', insertError)
-        return NextResponse.json({ error: 'Failed to add member to campaign' }, { status: 500 })
+        return NextResponse.json({ 
+          error: `Failed to add member to campaign: ${insertError.message}` 
+        }, { status: 500 })
       }
     }
 
@@ -96,7 +134,9 @@ export async function POST(request: NextRequest) {
 
     if (updateErr) {
       console.error('Failed to mark invitation accepted:', updateErr)
-      return NextResponse.json({ error: 'Failed to mark invitation as accepted' }, { status: 500 })
+      return NextResponse.json({ 
+        error: `Failed to mark invitation as accepted: ${updateErr.message}` 
+      }, { status: 500 })
     }
 
     return NextResponse.json({ ok: true })
