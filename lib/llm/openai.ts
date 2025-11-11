@@ -26,7 +26,7 @@ export async function generateJobOpenAI(
   if (isGpt5) {
     // Use Responses API for gpt-5 models
     // Note: gpt-5 models don't support custom temperature or standard chat completions
-    const responseBody: any = {
+    const responseBody: Record<string, unknown> = {
       model,
       input: prompt,
       // gpt-5 uses max_output_tokens and needs higher values to produce visible output (not just reasoning)
@@ -53,16 +53,26 @@ export async function generateJobOpenAI(
       throw new Error(`OpenAI Responses API failed ${response.status}: ${errorText}`)
     }
 
-    const data = await response.json()
+    const data: unknown = await response.json()
 
-    // Extract text from Responses API structure
+    // Extract text from Responses API structure using defensive checks
     let text = ''
-    if (data.output && Array.isArray(data.output)) {
-      for (const item of data.output) {
-        if (item.type === 'message' && item.content) {
-          for (const contentItem of item.content) {
-            if (contentItem.type === 'output_text' && contentItem.text) {
-              text += contentItem.text
+    if (data && typeof data === 'object') {
+      const d = data as Record<string, unknown>
+      const output = d.output
+      if (Array.isArray(output)) {
+        for (const item of output) {
+          if (item && typeof item === 'object') {
+            const it = item as Record<string, unknown>
+            if (it.type === 'message' && Array.isArray(it.content)) {
+              for (const contentItem of it.content) {
+                if (contentItem && typeof contentItem === 'object') {
+                  const ci = contentItem as Record<string, unknown>
+                  if (ci.type === 'output_text' && typeof ci.text === 'string') {
+                    text += ci.text
+                  }
+                }
+              }
             }
           }
         }
@@ -71,7 +81,11 @@ export async function generateJobOpenAI(
 
     // Fallback if no text found
     if (!text) {
-      text = JSON.stringify(data)
+      try {
+        text = JSON.stringify(data)
+      } catch {
+        text = String(data)
+      }
     }
 
     return {
@@ -82,7 +96,7 @@ export async function generateJobOpenAI(
     }
   } else {
     // Standard Chat Completions API for gpt-4, gpt-3.5, etc.
-    const resp = await client.chat.completions.create({
+    const resp: unknown = await client.chat.completions.create({
       model,
       messages: [{ role: 'user', content: prompt }],
       temperature: options.temperature ?? 0.7,
@@ -91,12 +105,30 @@ export async function generateJobOpenAI(
     })
 
     // Response parsing: attempt to be robust across client versions
-    const text =
-      // @ts-ignore
-      resp?.choices?.[0]?.message?.content ??
-      // @ts-ignore
-      resp?.choices?.[0]?.text ??
-      String(resp)
+    let text = ''
+    if (resp && typeof resp === 'object') {
+      const r = resp as Record<string, unknown>
+      const choices = Array.isArray(r.choices) ? (r.choices as unknown[]) : undefined
+      if (choices && choices.length > 0) {
+        const first = choices[0]
+        if (first && typeof first === 'object') {
+          const f = first as Record<string, unknown>
+          // new SDK may have message.content as string
+          if (f.message && typeof f.message === 'object') {
+            const msg = f.message as Record<string, unknown>
+            if (typeof msg.content === 'string') {
+              text = msg.content
+            }
+          }
+          // older responses may have text property on the choice
+          if (!text && typeof f.text === 'string') {
+            text = f.text
+          }
+        }
+      }
+    }
+
+    if (!text) text = String(resp)
 
     return {
       provider: 'openai',

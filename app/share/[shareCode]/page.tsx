@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
+import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { cookies } from 'next/headers'
 import { nanoid } from 'nanoid'
-import type { Campaign, Job, Organization, MissionType } from '@/types/database'
+import type { Job, Organization, MissionType } from '@/types/database'
 import JobVotingCard from './JobVotingCard'
 
 interface Props {
@@ -70,8 +71,8 @@ export default async function SharePage({ params }: Props) {
 
   // Fetch votes for these jobs
   const jobIds = activeJobs.map((j) => j.id)
-  let userVotes: Record<string, number> = {}
-  let voteCounts: Record<string, { upvotes: number; downvotes: number }> = {}
+  const userVotes: Record<string, number> = {}
+  const voteCounts: Record<string, { upvotes: number; downvotes: number }> = {}
 
   if (jobIds.length > 0) {
     // Get vote counts for all jobs
@@ -139,7 +140,7 @@ export default async function SharePage({ params }: Props) {
         <div className="mb-6">
           <h2 className="text-xl font-semibold text-gray-900 mb-2">Vote for Your Next Mission</h2>
           <p className="text-gray-600">
-            Review the available missions and vote for the ones you'd like to play. Your votes help the GM choose the next adventure!
+            Review the available missions and vote for the ones you&apos;d like to play. Your votes help the GM choose the next adventure!
           </p>
         </div>
 
@@ -171,7 +172,7 @@ export default async function SharePage({ params }: Props) {
             <div className="text-6xl mb-4">🎲</div>
             <h3 className="text-lg font-medium text-gray-900 mb-2">No missions available yet</h3>
             <p className="text-gray-600">
-              The GM hasn't posted any missions yet. Check back soon for exciting adventures!
+              The GM hasn&apos;t posted any missions yet. Check back soon for exciting adventures!
             </p>
           </div>
         )}
@@ -180,13 +181,13 @@ export default async function SharePage({ params }: Props) {
         <div className="mt-12 bg-blue-50 border border-blue-200 rounded-lg p-6">
           <h3 className="text-sm font-semibold text-blue-900 mb-2">How Voting Works</h3>
           <ul className="text-sm text-blue-800 space-y-1">
-            <li>• Vote for missions you'd like to play by clicking the upvote (👍) button</li>
-            <li>• Downvote missions you're less interested in with the downvote (👎) button</li>
+            <li>• Vote for missions you&apos;d like to play by clicking the upvote (👍) button</li>
+            <li>• Downvote missions you&apos;re less interested in with the downvote (👎) button</li>
             <li>• You can change your vote at any time</li>
             <li>• The GM will see the vote totals when deciding which mission to run next</li>
-            {!user && (
+                {!user && (
               <li className="mt-3 font-medium">
-                💡 Tip: <a href="/login" className="underline">Sign in</a> to ensure your votes are saved across devices
+                💡 Tip: <Link href="/login" className="underline">Sign in</Link> to ensure your votes are saved across devices
               </li>
             )}
           </ul>

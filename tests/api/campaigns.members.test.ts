@@ -2,7 +2,7 @@
 jest.mock('next/server', () => ({
   NextRequest: class {},
   NextResponse: {
-    json: (body: any, opts?: any) => ({ status: opts?.status ?? 200, body }),
+    json: (body: unknown, opts?: { status?: number }) => ({ status: opts?.status ?? 200, body }),
   },
 }))
 
@@ -13,7 +13,7 @@ jest.mock('@/lib/supabase/server', () => ({
 
 import { GET, POST } from '@/app/api/campaigns/[id]/members/route'
 import { createClient as mockCreateClient } from '@/lib/supabase/server'
-import { createFakeSupabase } from '@/tests/helpers/supabaseMock'
+import { createFakeSupabase, type SupabaseRow } from '@/tests/helpers/supabaseMock'
 
 describe('Campaign members API', () => {
   afterEach(() => {
@@ -21,23 +21,23 @@ describe('Campaign members API', () => {
   })
 
   test('GET returns 401 when unauthenticated', async () => {
-    const { fakeSupabase } = createFakeSupabase({ userId: null })
-    ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
+  const { fakeSupabase } = createFakeSupabase({ userId: null })
+  ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
-    const req: any = {}
-    const res = await GET(req, { params: { id: 'camp-1' } } as any)
-    expect((res as any).status).toBe(401)
+  const req = {} as unknown as Parameters<typeof GET>[0]
+  const res = await GET(req, { params: { id: 'camp-1' } } as unknown as Parameters<typeof GET>[1])
+  expect((res as unknown as { status: number }).status).toBe(401)
   })
 
   test('GET returns 403 when user is not a member', async () => {
     // First single() for membership check returns null -> not a member
-    const singleResponses: any[] = [ { data: null } ]
-    const { fakeSupabase } = createFakeSupabase({ userId: 'user-1', singleResponses })
-    ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
+  const singleResponses: Array<SupabaseRow<unknown>> = [ { data: null, error: null } ]
+  const { fakeSupabase } = createFakeSupabase({ userId: 'user-1', singleResponses })
+  ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
-    const req: any = {}
-    const res = await GET(req, { params: { id: 'camp-1' } } as any)
-    expect((res as any).status).toBe(403)
+  const req = {} as unknown as Parameters<typeof GET>[0]
+  const res = await GET(req, { params: { id: 'camp-1' } } as unknown as Parameters<typeof GET>[1])
+  expect((res as unknown as { status: number }).status).toBe(403)
   })
 
   test('GET returns members list when user is a member', async () => {
@@ -48,15 +48,16 @@ describe('Campaign members API', () => {
     ]
 
     // singleResponses: first for membership check, second for the chained select (thenable)
-    const singleResponses: any[] = [ { data: membership }, { data: membersList, error: null } ]
-    const { fakeSupabase } = createFakeSupabase({ userId: 'user-1', singleResponses })
-    ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
+  const singleResponses: Array<SupabaseRow<unknown>> = [ { data: membership, error: null }, { data: membersList, error: null } ]
+  const { fakeSupabase } = createFakeSupabase({ userId: 'user-1', singleResponses })
+  ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
-    const req: any = {}
-    const res = await GET(req, { params: { id: 'camp-1' } } as any)
-    expect((res as any).status).toBe(200)
-    expect((res as any).body).toHaveProperty('members')
-    expect((res as any).body.members).toHaveLength(2)
+  const req = {} as unknown as Parameters<typeof GET>[0]
+  const res = await GET(req, { params: { id: 'camp-1' } } as unknown as Parameters<typeof GET>[1])
+  expect((res as unknown as { status: number }).status).toBe(200)
+  const body = (res as unknown as { body: unknown }).body as { members?: unknown[] }
+  expect(body).toHaveProperty('members')
+  expect(body.members).toHaveLength(2)
   })
 
   test('POST adds member when requester is owner', async () => {
@@ -66,22 +67,23 @@ describe('Campaign members API', () => {
     const newMember = { id: 'm2', campaign_id: 'camp-1', user_id: 'user-2', role: 'co-gm', users: targetUser }
 
     // Queue responses for: membership check, user lookup, existing check, insert result
-    const singleResponses: any[] = [
-      { data: membership },
-      { data: targetUser },
-      { data: existing },
-      { data: newMember }
+    const singleResponses: Array<SupabaseRow<unknown>> = [
+      { data: membership, error: null },
+      { data: targetUser, error: null },
+      { data: existing, error: null },
+      { data: newMember, error: null }
     ]
 
     const { fakeSupabase, chain } = createFakeSupabase({ userId: 'user-1', singleResponses })
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
     // Simulate request body
-    const req: any = { json: async () => ({ email: 't@example.com', role: 'co-gm' }) }
-    const res = await POST(req, { params: { id: 'camp-1' } } as any)
+    const req = { json: async () => ({ email: 't@example.com', role: 'co-gm' }) } as unknown as Parameters<typeof POST>[0]
+    const res = await POST(req, { params: { id: 'camp-1' } } as unknown as Parameters<typeof POST>[1])
 
-    expect((res as any).status).toBe(201)
-    expect((res as any).body).toHaveProperty('member')
+  expect((res as unknown as { status: number }).status).toBe(201)
+  const body = (res as unknown as { body: unknown }).body as { member?: unknown }
+  expect(body).toHaveProperty('member')
     // Ensure insert was called
     expect(chain.insert).toHaveBeenCalled()
   })

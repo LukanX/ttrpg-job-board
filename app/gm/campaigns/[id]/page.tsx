@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect, notFound } from 'next/navigation'
 import Link from 'next/link'
 import { Edit } from 'lucide-react'
-import type { Campaign, Organization, MissionType, Job } from '@/types/database'
+import type { CampaignMemberRole } from '@/types/database'
 import CampaignTabs from './CampaignTabs'
 
 interface PageProps {
@@ -85,6 +85,8 @@ export default async function CampaignPage({ params }: PageProps) {
       user_id,
       role,
       created_at,
+      updated_at,
+      character_name,
       users:user_id (
         id,
         email,
@@ -107,6 +109,73 @@ export default async function CampaignPage({ params }: PageProps) {
     .order('created_at', { ascending: true })
 
   const invitationsList = invitations || []
+
+  // Fetch invite links for display in Members tab (owners only)
+  let inviteLinksList: Array<{
+    id: string
+    campaign_id: string
+    token: string
+    created_by: string
+    expires_at: string | null
+    max_uses: number | null
+    use_count: number
+    require_approval: boolean
+    is_active: boolean
+    created_at: string
+    revoked_at: string | null
+  }> = []
+  
+  let joinRequestsList: Array<{
+    id: string
+    campaign_id: string
+    user_id: string
+    invite_link_id: string | null
+    status: 'pending' | 'approved' | 'rejected'
+    requested_at: string
+    reviewed_at: string | null
+    reviewed_by: string | null
+    users?: {
+      id: string
+      email: string
+      display_name?: string | null
+    } | null
+  }> = []
+
+  if (canManageMembers) {
+    const { data: inviteLinks } = await supabase
+      .from('campaign_invite_links')
+      .select('id, campaign_id, token, created_by, expires_at, max_uses, use_count, require_approval, is_active, created_at, revoked_at')
+      .eq('campaign_id', id)
+      .order('created_at', { ascending: false })
+
+    inviteLinksList = inviteLinks || []
+
+    // Fetch join requests with user details
+    const { data: joinRequests } = await supabase
+      .from('campaign_join_requests')
+      .select(`
+        id,
+        campaign_id,
+        user_id,
+        invite_link_id,
+        status,
+        requested_at,
+        reviewed_at,
+        reviewed_by,
+        users!campaign_join_requests_user_id_fkey (
+          id,
+          email,
+          display_name
+        )
+      `)
+      .eq('campaign_id', id)
+      .order('requested_at', { ascending: false })
+
+    joinRequestsList = (joinRequests || []).map((req: any) => ({
+      ...req,
+      users: Array.isArray(req.users) ? req.users[0] : req.users
+    }))
+  }
 
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
@@ -156,16 +225,19 @@ export default async function CampaignPage({ params }: PageProps) {
         </div>
 
         {/* Tabs (Members tab now included) */}
-        <CampaignTabs
+      <CampaignTabs
           campaignId={id}
           organizations={organizations || []}
           missionTypes={missionTypes || []}
           jobs={jobs || []}
-          userRole={userRole as any}
+        userRole={userRole as CampaignMemberRole | null}
           canManage={canManageMembers}
           membersCount={membersCount}
           initialMembers={membersList}
           initialInvitations={invitationsList}
+          initialInviteLinks={inviteLinksList}
+          initialJoinRequests={joinRequestsList}
+          currentUserId={user.id}
         />
       </div>
     </div>

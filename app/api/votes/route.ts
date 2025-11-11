@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import type { Vote } from '@/types/database'
 
 interface VoteRequest {
   jobId: string
@@ -53,7 +54,7 @@ export async function POST(request: NextRequest) {
     }
 
     // First, check if a vote already exists
-    let existingVote
+    let existingVote: { id: string } | null = null
     if (user) {
       const { data } = await supabase
         .from('votes')
@@ -72,7 +73,7 @@ export async function POST(request: NextRequest) {
       existingVote = data
     }
 
-    let voteError
+    let voteError: unknown
     if (existingVote) {
       // Update existing vote
       const { error } = await supabase
@@ -82,16 +83,14 @@ export async function POST(request: NextRequest) {
       voteError = error
     } else {
       // Insert new vote
-      const voteData: any = {
+      // voteValue is guaranteed to be 1 or -1 here (we returned earlier if 0)
+      const voteData: Pick<Vote, 'job_id' | 'vote_value'> & Partial<Pick<Vote, 'user_id' | 'session_id'>> = {
         job_id: jobId,
-        vote_value: voteValue,
+        vote_value: voteValue as 1 | -1,
       }
 
-      if (user) {
-        voteData.user_id = user.id
-      } else if (sessionId) {
-        voteData.session_id = sessionId
-      }
+      if (user) voteData.user_id = user.id
+      else if (sessionId) voteData.session_id = sessionId
 
       const { error } = await supabase.from('votes').insert(voteData)
       voteError = error

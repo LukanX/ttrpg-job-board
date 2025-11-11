@@ -1,9 +1,11 @@
-'use client'
+"use client"
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { createClient } from '@/lib/supabase/client'
 import type { MissionType } from '@/types/database'
+import EditMissionTypeModal from '@/components/gm/EditMissionTypeModal'
+import DeleteMissionTypeButton from '@/components/gm/DeleteMissionTypeButton'
+import { Edit } from 'lucide-react'
 
 interface Props {
   campaignId: string
@@ -17,8 +19,9 @@ export default function MissionTypesTab({ campaignId, missionTypes }: Props) {
   const [tags, setTags] = useState('')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
+  const [editing, setEditing] = useState<null | MissionType>(null)
   const router = useRouter()
-  const supabase = createClient()
+  
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,16 +34,14 @@ export default function MissionTypesTab({ campaignId, missionTypes }: Props) {
         .map((tag) => tag.trim())
         .filter((tag) => tag.length > 0)
 
-      const { error: insertError } = await supabase
-        .from('mission_types')
-        .insert({
-          campaign_id: campaignId,
-          name,
-          description: description || null,
-          tags: tagsArray.length > 0 ? tagsArray : null,
-        })
+      const res = await fetch(`/api/campaigns/${campaignId}/mission-types`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, description: description || null, tags: tagsArray.length > 0 ? tagsArray : null }),
+      })
 
-      if (insertError) throw insertError
+      const body = await res.json().catch(() => ({}))
+      if (!res.ok) throw new Error(body?.error || 'Failed to create mission type')
 
       setName('')
       setDescription('')
@@ -135,22 +136,38 @@ export default function MissionTypesTab({ campaignId, missionTypes }: Props) {
         <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {missionTypes.map((missionType) => (
             <div key={missionType.id} className="bg-white shadow rounded-lg p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">{missionType.name}</h3>
-              {missionType.description && (
-                <p className="text-sm text-gray-600 mb-3">{missionType.description}</p>
-              )}
-              {missionType.tags && missionType.tags.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {missionType.tags.map((tag, idx) => (
-                    <span
-                      key={idx}
-                      className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded"
-                    >
-                      {tag}
-                    </span>
-                  ))}
+              <div className="flex items-start justify-between">
+                <div className="flex-1 pr-4">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-2">{missionType.name}</h3>
+                  {missionType.description && (
+                    <p className="text-sm text-gray-600 mb-3">{missionType.description}</p>
+                  )}
+                  {missionType.tags && missionType.tags.length > 0 && (
+                    <div className="flex flex-wrap gap-2">
+                      {missionType.tags.map((tag, idx) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
                 </div>
-              )}
+
+                <div className="flex items-start gap-2">
+                  <button
+                    onClick={() => setEditing(missionType)}
+                    title="Edit mission type"
+                    aria-label="Edit mission type"
+                    className="inline-flex items-center justify-center p-1 rounded-md text-gray-600 hover:bg-gray-50 border border-transparent hover:border-gray-100"
+                  >
+                    <Edit className="h-4 w-4" />
+                  </button>
+                  <DeleteMissionTypeButton campaignId={campaignId} missionTypeId={missionType.id} />
+                </div>
+              </div>
             </div>
           ))}
         </div>
@@ -161,6 +178,15 @@ export default function MissionTypesTab({ campaignId, missionTypes }: Props) {
             Add mission types to categorize and guide job generation
           </p>
         </div>
+      )}
+
+      {editing && (
+        <EditMissionTypeModal
+          isOpen={Boolean(editing)}
+          onClose={() => setEditing(null)}
+          campaignId={campaignId}
+          missionType={editing}
+        />
       )}
     </div>
   )

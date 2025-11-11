@@ -21,7 +21,7 @@ Fields: id, title, hook, difficulty (1-10), reward, gm_notes (secret), encounter
 Keep the output compact and valid JSON only.`
 
 async function run(provider: 'openai' | 'gemini', count = 25) {
-  const results: any[] = []
+  const results: unknown[] = []
 
   for (let i = 0; i < count; i++) {
     const start = Date.now()
@@ -31,9 +31,10 @@ async function run(provider: 'openai' | 'gemini', count = 25) {
       results.push({ index: i, ok: true, elapsed, provider: res.provider, model: res.model, text: res.text })
       // Respectful pause to avoid immediate rate limits
       await new Promise((r) => setTimeout(r, 200))
-    } catch (err: any) {
+    } catch (err: unknown) {
       const elapsed = Date.now() - start
-      results.push({ index: i, ok: false, elapsed, error: err?.message ?? String(err) })
+      const msg = err instanceof Error ? err.message : String(err)
+      results.push({ index: i, ok: false, elapsed, error: msg })
       await new Promise((r) => setTimeout(r, 500))
     }
   }

@@ -10,7 +10,8 @@ jest.mock('@/lib/supabase/client', () => ({
   }),
 }))
 
-import { render, screen, waitFor } from '@testing-library/react'
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CampaignForm from '@/components/gm/CampaignForm'
 

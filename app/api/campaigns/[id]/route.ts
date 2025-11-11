@@ -1,11 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { z } from 'zod'
+import type { Campaign } from '@/types/database'
 import { createClient } from '@/lib/supabase/server'
 
 const PatchCampaignSchema = z.object({
   name: z.string().min(1, 'Name is required'),
   party_level: z.number().int().min(1).max(20),
-  settings: z.any().optional(),
+  settings: z.record(z.string(), z.unknown()).optional(),
 })
 
 export async function PATCH(
@@ -69,11 +70,11 @@ export async function PATCH(
       return NextResponse.json({ error: 'Campaign not found' }, { status: 404 })
     }
 
-    const updatePayload: any = {
+    const updatePayload: Partial<Pick<Campaign, 'name' | 'party_level' | 'settings'>> = {
       name: parse.data.name,
       party_level: parse.data.party_level,
     }
-    if (parse.data.settings !== undefined) updatePayload.settings = parse.data.settings
+    if (parse.data.settings !== undefined) updatePayload.settings = parse.data.settings as Record<string, unknown>
 
     const { data: updated, error: updateError } = await supabase
       .from('campaigns')

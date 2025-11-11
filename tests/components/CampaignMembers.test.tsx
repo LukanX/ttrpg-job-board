@@ -4,6 +4,8 @@ jest.mock('next/navigation', () => ({
   useRouter: jest.fn(),
 }))
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import React from 'react'
 import { useRouter } from 'next/navigation'
 import CampaignMembers from '@/components/gm/CampaignMembers'
 

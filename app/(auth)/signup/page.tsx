@@ -112,7 +112,7 @@ export default function SignupPage() {
                 {role === 'gm' ? (
                   <> to access your GM dashboard.</>
                 ) : (
-                  <> to view campaigns you've been invited to.</>
+                  <> to view campaigns you&apos;ve been invited to.</>
                 )}
               </div>
             </div>

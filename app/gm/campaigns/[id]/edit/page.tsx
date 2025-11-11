@@ -1,4 +1,5 @@
 import React from 'react'
+import Link from 'next/link'
 import CampaignForm from '@/components/gm/CampaignForm'
 import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
@@ -35,8 +36,8 @@ export default async function EditCampaignPage({ params }: Params) {
       <div className="max-w-2xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Campaign not found</h1>
-          <p className="text-gray-600 mb-4">We couldn't find that campaign. It may have been deleted or the link is incorrect.</p>
-          <a href="/gm/campaigns" className="text-blue-600 hover:text-blue-800">Back to campaigns</a>
+          <p className="text-gray-600 mb-4">We couldn&apos;t find that campaign. It may have been deleted or the link is incorrect.</p>
+          <Link href="/gm/campaigns" className="text-blue-600 hover:text-blue-800">Back to campaigns</Link>
         </div>
       </div>
     )
@@ -48,8 +49,8 @@ export default async function EditCampaignPage({ params }: Params) {
       <div className="max-w-2xl mx-auto py-6 sm:px-6 lg:px-8">
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access denied</h1>
-          <p className="text-gray-600 mb-4">You don't have permission to edit this campaign.</p>
-          <a href="/gm/campaigns" className="text-blue-600 hover:text-blue-800">Back to campaigns</a>
+          <p className="text-gray-600 mb-4">You don&apos;t have permission to edit this campaign.</p>
+          <Link href="/gm/campaigns" className="text-blue-600 hover:text-blue-800">Back to campaigns</Link>
         </div>
       </div>
     )
@@ -60,7 +61,6 @@ export default async function EditCampaignPage({ params }: Params) {
       <div className="px-4 py-6 sm:px-0">
         <h1 className="text-3xl font-bold text-gray-900 mb-6">Edit Campaign</h1>
         <div className="bg-white shadow rounded-lg p-6">
-          {/* @ts-ignore server -> client prop passing */}
           <CampaignForm campaign={{ id: campaign.id, name: campaign.name, party_level: campaign.party_level }} />
         </div>
       </div>

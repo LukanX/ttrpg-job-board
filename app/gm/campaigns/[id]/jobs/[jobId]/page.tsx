@@ -2,6 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Edit } from 'lucide-react'
+import DeleteJobButton from '@/components/gm/DeleteJobButton'
 import type { Job, Organization, MissionType, Encounter, NPC } from '@/types/database'
 
 interface Props {
@@ -57,6 +58,7 @@ export default async function JobDetailPage({ params }: Props) {
 
   const isCoGM = membership?.role === 'co-gm'
   const canEdit = isCreator || isOwner || isCoGM
+  const canDelete = isCreator || isOwner
 
   if (!campaign && !membership) {
     notFound()
@@ -130,6 +132,9 @@ export default async function JobDetailPage({ params }: Props) {
                   Edit
                 </Link>
               )}
+                {canDelete && (
+                  <DeleteJobButton campaignId={campaignId} jobId={jobId} />
+                )}
             </div>
           </div>
 

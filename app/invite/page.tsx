@@ -54,7 +54,7 @@ export default async function InvitePage({ searchParams }: Props) {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-lg w-full space-y-6 bg-white p-6 rounded shadow">
         <div>
-          <h2 className="text-2xl font-semibold">You're invited</h2>
+    <h2 className="text-2xl font-semibold">You&apos;re invited</h2>
           <p className="mt-2 text-sm text-gray-600">You were invited to join the campaign <strong>{campData?.name ?? campaignId}</strong>.</p>
         </div>
 
@@ -78,7 +78,7 @@ export default async function InvitePage({ searchParams }: Props) {
             // Client-side button to POST accept
             <div>
               {/* dynamically load client component */}
-              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+              { }
               <script type="module" />
               <div id="accept-cta">
                 <AcceptInviteButton token={token} />

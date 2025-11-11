@@ -208,7 +208,7 @@ export default function GenerateJobPage() {
                 value={additionalContext}
                 onChange={(e) => setAdditionalContext(e.target.value)}
                 className="mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm px-3 py-2 border"
-                placeholder="Any specific details, themes, or requirements for this job? (e.g., 'Include a space station encounter' or 'Make it stealth-focused')"
+                placeholder="Any specific details, themes, or requirements for this job? (e.g., &apos;Include a space station encounter&apos; or &apos;Make it stealth-focused&apos;)"
               />
             </div>
 
@@ -247,7 +247,7 @@ export default function GenerateJobPage() {
                     AI is generating your mission...
                   </h3>
                   <p className="text-sm text-blue-700">
-                    This may take 10-30 seconds. We're creating the job description, encounters, and NPCs for you.
+                    This may take 10-30 seconds. We&apos;re creating the job description, encounters, and NPCs for you.
                   </p>
                 </div>
               </div>

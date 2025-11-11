@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { PATCH } from '@/app/api/jobs/[id]/route'
 import { createClient } from '@/lib/supabase/server'
 import { NextRequest } from 'next/server'

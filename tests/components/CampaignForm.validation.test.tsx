@@ -3,15 +3,18 @@ import React from 'react'
 jest.mock('nanoid', () => ({ nanoid: () => 'fixedshare' }))
 
 // Mock the browser Supabase client used by the component to avoid requiring env vars
+const mockCreateClient = jest.fn(() => ({
+  auth: { getUser: async () => ({ data: { user: { id: 'user-1' } }, error: null }) },
+  from: () => ({ insert: () => ({ select: () => ({ single: async () => ({ data: { id: 'camp-1' } } ) }) }) }),
+}))
+
 jest.mock('@/lib/supabase/client', () => ({
-  createClient: () => ({
-    auth: { getUser: async () => ({ data: { user: { id: 'user-1' } }, error: null }) },
-    from: () => ({ insert: () => ({ select: () => ({ single: async () => ({ data: { id: 'camp-1' } } ) }) }) }),
-  }),
+  createClient: mockCreateClient,
 }))
 
 // zodResolver is provided globally in jest.setup.ts to keep tests stable
 
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { render, screen } from '@testing-library/react'
 import userEvent from '@testing-library/user-event'
 import CampaignForm from '@/components/gm/CampaignForm'
@@ -28,9 +31,11 @@ describe('CampaignForm validation', () => {
 
   test('create flow shows validation error for empty name and does not call supabase', async () => {
   // Replace the createClient implementation so we can assert auth.getUser is not called
-  const supabaseModule = require('@/lib/supabase/client')
   const mockGetUser = jest.fn()
-  supabaseModule.createClient = jest.fn(() => ({ auth: { getUser: mockGetUser } }))
+  mockCreateClient.mockImplementation(() => ({
+    auth: { getUser: mockGetUser },
+    from: () => ({ insert: () => ({ select: () => ({ single: async () => ({ data: { id: 'camp-1' } }) }) }) }),
+  }))
 
     render(<CampaignForm />)
 
@@ -40,7 +45,7 @@ describe('CampaignForm validation', () => {
     // Use userEvent which wraps interactions in act()
     try {
       await userEvent.click(createButton)
-    } catch (err) {
+    } catch {
       // resolver may throw a ZodError in the test environment; that's acceptable for this check
     }
 
@@ -65,7 +70,7 @@ describe('CampaignForm validation', () => {
       await userEvent.clear(levelInput)
       await userEvent.type(levelInput, '0')
       await userEvent.click(saveButton)
-    } catch (err) {
+    } catch {
       // ignore thrown ZodError from resolver
     }
 

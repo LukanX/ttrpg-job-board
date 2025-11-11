@@ -19,7 +19,7 @@ export default function AcceptInviteButton({ token }: { token: string }) {
         body: JSON.stringify({ token }),
       })
       
-      let body
+      let body: unknown
       try {
         body = await res.json()
       } catch (jsonErr) {
@@ -30,8 +30,9 @@ export default function AcceptInviteButton({ token }: { token: string }) {
       console.log('Accept invitation response:', { status: res.status, body })
       
       if (!res.ok) {
-        // Use the error message from the API response if available
-        const errorMsg = body.error || `Failed to accept invitation (Status: ${res.status})`
+        // Use the error message from the API response if available, but include a generic prefix
+        const maybeErr = body && typeof body === 'object' && 'error' in body ? (body as Record<string, unknown>)['error'] : undefined
+        const errorMsg = typeof maybeErr === 'string' ? `Failed to accept invitation: ${maybeErr}` : `Failed to accept invitation (Status: ${res.status})`
         console.error('Accept invitation failed:', errorMsg)
         throw new Error(errorMsg)
       }
@@ -39,15 +40,16 @@ export default function AcceptInviteButton({ token }: { token: string }) {
       setSuccess(true)
       // Refresh so any server components update
       try { router.refresh() } catch {}
-    } catch (err: any) {
+    } catch (err: unknown) {
       console.error('Accept invitation error:', err)
-      setError(err?.message || 'Failed')
+      const msg = err instanceof Error ? err.message : String(err)
+      setError(msg || 'Failed')
     } finally {
       setLoading(false)
     }
   }
 
-  if (success) return <div className="text-sm text-green-700">Invitation accepted — you're a member now.</div>
+  if (success) return <div className="text-sm text-green-700">Invitation accepted — you&apos;re a member now.</div>
 
   return (
     <div>

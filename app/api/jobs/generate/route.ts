@@ -18,14 +18,14 @@ interface JobData {
   encounters: Array<{
     encounter_type: string
     description: string
-    enemies: any
+    enemies: Record<string, unknown> | null
     challenge_rating?: string
   }>
   npcs: Array<{
     name: string
     role: string
     personality?: string
-    stats_block?: any
+    stats_block?: Record<string, unknown> | null
   }>
   gm_notes?: string
 }
@@ -110,7 +110,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate job using LLM (try OpenAI first, fallback to Gemini)
-    let llmResponse: any
+  let llmResponse: unknown
     let provider: 'openai' | 'gemini' = 'openai'
 
     try {
@@ -137,7 +137,7 @@ export async function POST(request: NextRequest) {
           jobData = JSON.parse(llmResponse)
         }
       } else {
-        jobData = llmResponse
+        jobData = llmResponse as unknown as JobData
       }
       console.log('Parsed job data:', JSON.stringify(jobData, null, 2))
     } catch (parseError) {
@@ -217,11 +217,11 @@ export async function POST(request: NextRequest) {
       provider,
       message: 'Job generated successfully',
     })
-  } catch (error) {
+  } catch (error: unknown) {
     console.error('Error generating job:', error)
     return NextResponse.json(
       {
-        error: error instanceof Error ? error.message : 'Failed to generate job',
+        error: error instanceof Error ? error.message : String(error ?? 'Failed to generate job'),
       },
       { status: 500 }
     )
@@ -231,8 +231,8 @@ export async function POST(request: NextRequest) {
 function buildJobPrompt(params: {
   partyLevel: number
   difficulty: number
-  organization?: any
-  missionType?: any
+  organization?: Record<string, unknown>
+  missionType?: Record<string, unknown>
   additionalContext?: string | null
 }): string {
   const { partyLevel, difficulty, organization, missionType, additionalContext } = params
@@ -243,24 +243,30 @@ DIFFICULTY: ${difficulty}/10 (1=trivial, 5=moderate, 10=deadly)
 
 `
 
-  if (organization) {
-    prompt += `ORGANIZATION: ${organization.name}`
-    if (organization.faction_type) {
-      prompt += ` (${organization.faction_type})`
+  if (organization && typeof organization === 'object') {
+    const org = organization as Record<string, unknown>
+    const name = typeof org.name === 'string' ? org.name : 'Organization'
+    prompt += `ORGANIZATION: ${name}`
+    if (typeof org.faction_type === 'string' && org.faction_type) {
+      prompt += ` (${org.faction_type})`
     }
-    if (organization.description) {
-      prompt += `\n${organization.description}`
+    if (typeof org.description === 'string' && org.description) {
+      prompt += `\n${org.description}`
     }
     prompt += '\n\n'
   }
 
-  if (missionType) {
-    prompt += `MISSION TYPE: ${missionType.name}`
-    if (missionType.description) {
-      prompt += `\n${missionType.description}`
+  if (missionType && typeof missionType === 'object') {
+    const mt = missionType as Record<string, unknown>
+    const mtName = typeof mt.name === 'string' ? mt.name : 'Mission'
+    prompt += `MISSION TYPE: ${mtName}`
+    if (typeof mt.description === 'string' && mt.description) {
+      prompt += `\n${mt.description}`
     }
-    if (missionType.tags && missionType.tags.length > 0) {
-      prompt += `\nTags: ${missionType.tags.join(', ')}`
+    if (Array.isArray(mt.tags) && mt.tags.length > 0) {
+      // tags may be unknown[]; filter strings
+      const tags = mt.tags.filter((t: unknown) => typeof t === 'string') as string[]
+      if (tags.length > 0) prompt += `\nTags: ${tags.join(', ')}`
     }
     prompt += '\n\n'
   }

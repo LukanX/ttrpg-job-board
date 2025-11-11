@@ -2,7 +2,7 @@
 jest.mock('next/server', () => ({
   NextRequest: class {},
   NextResponse: {
-    json: (body: any, opts?: any) => ({ status: opts?.status ?? 200, body }),
+    json: (body: unknown, opts?: { status?: number }) => ({ status: opts?.status ?? 200, body }),
   },
 }))
 
@@ -13,7 +13,7 @@ jest.mock('@/lib/supabase/server', () => ({
 
 import { PATCH } from '@/app/api/campaigns/[id]/route'
 import { createClient as mockCreateClient } from '@/lib/supabase/server'
-import { createFakeSupabase } from '@/tests/helpers/supabaseMock'
+import { createFakeSupabase, type SupabaseRow } from '@/tests/helpers/supabaseMock'
 
 describe('PATCH /api/campaigns/:id', () => {
   afterEach(() => {
@@ -21,19 +21,19 @@ describe('PATCH /api/campaigns/:id', () => {
   })
 
   test('returns 400 for invalid body', async () => {
-    const req: any = { json: async () => ({ party_level: 3 }) }
-    const res = await PATCH(req, { params: { id: 'camp-1' } } as any)
+    const req = { json: async () => ({ party_level: 3 }) } as unknown as Parameters<typeof PATCH>[0]
+    const res = await PATCH(req, { params: { id: 'camp-1' } } as unknown as Parameters<typeof PATCH>[1])
     // Expect a NextResponse-like object with status 400
-    expect((res as any).status).toBe(400)
+    expect((res as unknown as { status: number }).status).toBe(400)
   })
 
   test('returns 401 when unauthenticated', async () => {
     const { fakeSupabase } = createFakeSupabase({ userId: null })
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
-    const req: any = { json: async () => ({ name: 'New Name', party_level: 5 }) }
-    const res = await PATCH(req, { params: { id: 'camp-1' } } as any)
-    expect((res as any).status).toBe(401)
+    const req = { json: async () => ({ name: 'New Name', party_level: 5 }) } as unknown as Parameters<typeof PATCH>[0]
+    const res = await PATCH(req, { params: { id: 'camp-1' } } as unknown as Parameters<typeof PATCH>[1])
+    expect((res as unknown as { status: number }).status).toBe(401)
   })
 
   test('updates campaign when authenticated owner', async () => {
@@ -42,18 +42,18 @@ describe('PATCH /api/campaigns/:id', () => {
     const membershipData = { campaign_id: 'camp-1', user_id: 'user-1', role: 'owner' }
 
     // Need 3 single() responses: 1 for membership check, 1 for campaign fetch, 1 for update result
-    const singleResponses: any[] = [
-      { data: membershipData },  // First: membership check
-      { data: existingCampaign }, // Second: campaign fetch (for validation)
-      { data: updatedCampaign }   // Third: update result
+    const singleResponses: Array<SupabaseRow<unknown>> = [
+      { data: membershipData, error: null },  // First: membership check
+      { data: existingCampaign, error: null }, // Second: campaign fetch (for validation)
+      { data: updatedCampaign, error: null }   // Third: update result
     ]
     const { fakeSupabase, chain } = createFakeSupabase({ userId: 'user-1', singleResponses })
     ;(mockCreateClient as jest.Mock).mockResolvedValue(fakeSupabase)
 
-    const req: any = { json: async () => ({ name: 'New Name', party_level: 5 }) }
-    const res = await PATCH(req, { params: { id: 'camp-1' } } as any)
+  const req = { json: async () => ({ name: 'New Name', party_level: 5 }) } as unknown as Parameters<typeof PATCH>[0]
+  const res = await PATCH(req, { params: { id: 'camp-1' } } as unknown as Parameters<typeof PATCH>[1])
 
-    expect((res as any).status).toBe(200)
+  expect((res as unknown as { status: number }).status).toBe(200)
     // Ensure update was called (update then single)
     expect(chain.update).toHaveBeenCalled()
   })
