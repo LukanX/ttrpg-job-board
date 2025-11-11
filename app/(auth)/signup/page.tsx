@@ -11,6 +11,7 @@ export default function SignupPage() {
   const [displayName, setDisplayName] = useState('')
   const [role, setRole] = useState<'gm' | 'player'>('player')
   const [error, setError] = useState<string | null>(null)
+  const [success, setSuccess] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
   const router = useRouter()
   const supabase = createClient()
@@ -18,6 +19,7 @@ export default function SignupPage() {
   const handleSignup = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
+    setSuccess(null)
     setLoading(true)
 
     try {
@@ -69,8 +71,8 @@ export default function SignupPage() {
         }
         router.refresh()
       } else {
-        // Email confirmation required
-        setError('Please check your email to confirm your account before signing in.')
+        // Email confirmation required - show success message
+        setSuccess('Account created! Please check your email to confirm your account.')
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign up')
@@ -97,6 +99,22 @@ export default function SignupPage() {
           {error && (
             <div className="rounded-md bg-red-50 p-4">
               <div className="text-sm text-red-800">{error}</div>
+            </div>
+          )}
+          {success && (
+            <div className="rounded-md bg-green-50 p-4 space-y-3">
+              <div className="text-sm text-green-800">{success}</div>
+              <div className="text-sm text-green-700">
+                After confirming your email, you can{' '}
+                <Link href="/login" className="font-medium text-green-900 underline hover:text-green-800">
+                  sign in here
+                </Link>
+                {role === 'gm' ? (
+                  <> to access your GM dashboard.</>
+                ) : (
+                  <> to view campaigns you've been invited to.</>
+                )}
+              </div>
             </div>
           )}
           <div className="space-y-4">
@@ -189,10 +207,10 @@ export default function SignupPage() {
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={loading || !!success}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Creating account...' : 'Create account'}
+              {loading ? 'Creating account...' : success ? 'Account created!' : 'Create account'}
             </button>
           </div>
         </form>
