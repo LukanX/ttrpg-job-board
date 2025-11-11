@@ -77,18 +77,20 @@ export async function POST(request: NextRequest) {
     
     // Ensure user profile exists in public.users table before adding to campaign
     // This handles the case where a user signed up but their profile wasn't created
-    const { data: existingProfile } = await serviceClient
+    const existingProfileRes = await serviceClient
       .from('users')
       .select('id')
       .eq('id', user.id)
       .single()
-    
+
+    const existingProfile = existingProfileRes?.data ?? null
+
     if (!existingProfile) {
       console.log('User profile does not exist, creating it now')
       const displayName = user.user_metadata?.display_name || user.email?.split('@')[0] || 'User'
       const role = user.user_metadata?.role || 'player'
-      
-      const { error: profileError } = await serviceClient
+
+      const profileRes = await serviceClient
         .from('users')
         .insert({
           id: user.id,
@@ -96,17 +98,19 @@ export async function POST(request: NextRequest) {
           display_name: displayName,
           role: role,
         })
-      
+
+      const profileError = profileRes?.error ?? null
+
       if (profileError) {
         console.error('Failed to create user profile:', profileError)
-        return NextResponse.json({ 
-          error: 'Failed to create user profile. Please contact support.' 
+        return NextResponse.json({
+          error: 'Failed to create user profile. Please contact support.',
         }, { status: 500 })
       }
     }
-    
+
     // Add member (use service role to bypass RLS)
-    const { error: insertError } = await serviceClient
+    const insertRes = await serviceClient
       .from('campaign_members')
       .insert({
         campaign_id: invitation.campaign_id,
@@ -114,28 +118,32 @@ export async function POST(request: NextRequest) {
         role: invitation.role,
       })
 
+    const insertError = insertRes?.error ?? null
+
     if (insertError) {
       // Check if it's a duplicate (user already a member)
-      if (insertError.code === '23505') {
+      if ((insertError as any).code === '23505') {
         console.log('User already a member, continuing to mark invitation accepted')
       } else {
         console.error('Failed to add campaign member:', insertError)
-        return NextResponse.json({ 
-          error: `Failed to add member to campaign: ${insertError.message}` 
+        return NextResponse.json({
+          error: `Failed to add member to campaign: ${(insertError as any).message ?? String(insertError)}`,
         }, { status: 500 })
       }
     }
 
     // Mark invitation as accepted (use service role to ensure it works)
-    const { error: updateErr } = await serviceClient
+    const updateRes = await serviceClient
       .from('campaign_invitations')
       .update({ accepted: true, invited_user_id: user.id, accepted_at: new Date().toISOString() })
       .eq('id', invitation.id)
 
+    const updateErr = updateRes?.error ?? null
+
     if (updateErr) {
       console.error('Failed to mark invitation accepted:', updateErr)
-      return NextResponse.json({ 
-        error: `Failed to mark invitation as accepted: ${updateErr.message}` 
+      return NextResponse.json({
+        error: `Failed to mark invitation as accepted: ${(updateErr as any).message ?? String(updateErr)}`,
       }, { status: 500 })
     }
 

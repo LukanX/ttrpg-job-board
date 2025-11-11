@@ -30,8 +30,8 @@ export default function AcceptInviteButton({ token }: { token: string }) {
       console.log('Accept invitation response:', { status: res.status, body })
       
       if (!res.ok) {
-        // Use the error message from the API response if available
-        const errorMsg = body.error || `Failed to accept invitation (Status: ${res.status})`
+        // Use the error message from the API response if available, but include a generic prefix
+        const errorMsg = body?.error ? `Failed to accept invitation: ${body.error}` : `Failed to accept invitation (Status: ${res.status})`
         console.error('Accept invitation failed:', errorMsg)
         throw new Error(errorMsg)
       }
