@@ -95,6 +95,7 @@ export interface CampaignMember {
   campaign_id: string
   user_id: string
   role: CampaignMemberRole
+  character_name?: string | null
   created_at: string
   updated_at: string
 }

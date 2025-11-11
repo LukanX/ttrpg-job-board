@@ -23,6 +23,34 @@ interface Props {
     created_at?: string
     expires_at?: string
   }>
+  initialInviteLinks?: Array<{
+    id: string
+    campaign_id: string
+    token: string
+    created_by: string
+    expires_at: string | null
+    max_uses: number | null
+    use_count: number
+    require_approval: boolean
+    is_active: boolean
+    created_at: string
+    revoked_at: string | null
+  }>
+  initialJoinRequests?: Array<{
+    id: string
+    campaign_id: string
+    user_id: string
+    invite_link_id: string | null
+    status: 'pending' | 'approved' | 'rejected'
+    requested_at: string
+    reviewed_at: string | null
+    reviewed_by: string | null
+    users?: {
+      id: string
+      email: string
+      display_name?: string | null
+    } | null
+  }>
 }
 
 type TabType = 'jobs' | 'organizations' | 'mission-types' | 'members'
@@ -34,10 +62,13 @@ export default function CampaignTabs({
   jobs,
   initialMembers,
   initialInvitations,
+  initialInviteLinks,
+  initialJoinRequests,
   userRole,
   canManage,
   membersCount,
-}: Props & { userRole?: 'owner' | 'co-gm' | 'viewer' | null; canManage?: boolean; membersCount?: number }) {
+  currentUserId,
+}: Props & { userRole?: 'owner' | 'co-gm' | 'viewer' | null; canManage?: boolean; membersCount?: number; currentUserId?: string }) {
   const [activeTab, setActiveTab] = useState<TabType>('jobs')
 
   const tabs = [
@@ -91,13 +122,18 @@ export default function CampaignTabs({
           <MissionTypesTab campaignId={campaignId} missionTypes={missionTypes} />
         )}
         {activeTab === 'members' && (
-          <CampaignMembers
-            campaignId={campaignId}
-            userRole={userRole as CampaignMemberRole | null}
-            canManage={!!canManage}
-            initialMembers={initialMembers}
-            initialInvitations={initialInvitations}
-          />
+          <>
+            <CampaignMembers
+              campaignId={campaignId}
+              userRole={userRole as CampaignMemberRole | null}
+              canManage={!!canManage}
+              initialMembers={initialMembers}
+              initialInvitations={initialInvitations}
+              initialInviteLinks={initialInviteLinks}
+              initialJoinRequests={initialJoinRequests}
+              currentUserId={currentUserId}
+            />
+          </>
         )}
       </div>
     </div>
