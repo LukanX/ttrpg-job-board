@@ -164,20 +164,40 @@ export async function DELETE(
       )
     }
 
-    // Attempt delete
+    // Server-side cleanup: delete dependent records first to avoid FK constraint errors.
+    // Delete encounters
+    const { error: encountersDeleteError } = await supabase
+      .from('encounters')
+      .delete()
+      .eq('job_id', jobId)
+
+    if (encountersDeleteError) {
+      console.error('Error deleting encounters for job:', encountersDeleteError)
+      return NextResponse.json({ error: 'Failed to delete related encounters' }, { status: 500 })
+    }
+
+    // Delete NPCs
+    const { error: npcsDeleteError } = await supabase.from('npcs').delete().eq('job_id', jobId)
+
+    if (npcsDeleteError) {
+      console.error('Error deleting npcs for job:', npcsDeleteError)
+      return NextResponse.json({ error: 'Failed to delete related NPCs' }, { status: 500 })
+    }
+
+    // Delete votes (if any)
+    const { error: votesDeleteError } = await supabase.from('votes').delete().eq('job_id', jobId)
+
+    if (votesDeleteError) {
+      console.error('Error deleting votes for job:', votesDeleteError)
+      return NextResponse.json({ error: 'Failed to delete related votes' }, { status: 500 })
+    }
+
+    // Finally delete the job itself
     const { error: deleteError } = await supabase.from('jobs').delete().eq('id', jobId)
 
     if (deleteError) {
       console.error('Error deleting job:', deleteError)
       const msg = deleteError.message || 'Failed to delete job'
-      // Friendly message if FK constraint
-      if (msg.toLowerCase().includes('foreign key') || msg.toLowerCase().includes('violates')) {
-        return NextResponse.json(
-          { error: 'Cannot delete job because related records exist (encounters, npcs, etc.)' },
-          { status: 409 }
-        )
-      }
-
       return NextResponse.json({ error: msg }, { status: 500 })
     }
 

@@ -70,8 +70,8 @@ export default async function SharePage({ params }: Props) {
 
   // Fetch votes for these jobs
   const jobIds = activeJobs.map((j) => j.id)
-  let userVotes: Record<string, number> = {}
-  let voteCounts: Record<string, { upvotes: number; downvotes: number }> = {}
+  const userVotes: Record<string, number> = {}
+  const voteCounts: Record<string, { upvotes: number; downvotes: number }> = {}
 
   if (jobIds.length > 0) {
     // Get vote counts for all jobs

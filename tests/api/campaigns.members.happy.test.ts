@@ -37,7 +37,7 @@ describe('Campaign members API - happy paths for PATCH & DELETE', () => {
 
     if ((res as any).status !== 200) {
       // Log body for debugging test failures
-      // eslint-disable-next-line no-console
+       
       console.error('PATCH response body:', JSON.stringify((res as any).body, null, 2))
     }
 

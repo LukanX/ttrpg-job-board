@@ -78,7 +78,7 @@ export default async function InvitePage({ searchParams }: Props) {
             // Client-side button to POST accept
             <div>
               {/* dynamically load client component */}
-              {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
+              { }
               <script type="module" />
               <div id="accept-cta">
                 <AcceptInviteButton token={token} />
