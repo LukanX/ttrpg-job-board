@@ -12,7 +12,8 @@ type Member = {
 	user_id: string
 	role: 'owner' | 'co-gm' | 'viewer'
 	created_at: string
-	users: { id: string; email: string; display_name?: string | null }
+	// users can be null if the referenced user was removed; make nullable
+	users?: { id: string; email: string; display_name?: string | null } | null
 }
 
 type Invitation = {
@@ -259,8 +260,8 @@ export default function CampaignMembers({
 						members.map((m) => (
 							<div key={m.id} className="flex items-center justify-between">
 								<div>
-									<p className="font-medium text-gray-900">{m.users.display_name || m.users.email}</p>
-									<p className="text-xs text-gray-500">{m.users.email}</p>
+									<p className="font-medium text-gray-900">{m.users?.display_name || m.users?.email || 'Unknown user'}</p>
+									<p className="text-xs text-gray-500">{m.users?.email ?? '—'}</p>
 								</div>
 								<div className="flex items-center gap-3">
 									<span className="text-sm text-gray-600">{m.role}</span>

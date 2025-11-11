@@ -66,6 +66,9 @@ GOOGLE_API_KEY=your_google_ai_api_key
 
 # App
 NEXT_PUBLIC_APP_URL=http://localhost:3000
+
+# Optional: Admin API key for cleanup endpoints
+ADMIN_API_KEY=your_secure_random_key
 ```
 
 4. **Set up the database**
@@ -143,6 +146,33 @@ job-board/
 - API keys stored in environment variables (never committed)
 - Server-side authentication checks
 - Vote validation (one vote per user/session per job)
+
+## 🧹 Maintenance
+
+### Invitation Cleanup
+
+The system includes automatic cleanup for expired campaign invitations:
+
+- **Audit Trail**: Accepted invitations are kept in the database (soft delete) with `accepted: true` and `accepted_at` timestamp
+- **Automatic Cleanup**: Invitations expired for more than 30 days are automatically deleted to prevent clutter
+- **Manual Trigger**: Run cleanup manually via API endpoint:
+
+```bash
+curl -X POST https://your-domain.com/api/admin/cleanup-invitations \
+  -H "Authorization: Bearer YOUR_ADMIN_API_KEY"
+```
+
+**Scheduled Cleanup** (optional):
+- Use Vercel Cron Jobs or external scheduler to run cleanup daily
+- Add to `vercel.json`:
+```json
+{
+  "crons": [{
+    "path": "/api/admin/cleanup-invitations",
+    "schedule": "0 2 * * *"
+  }]
+}
+```
 
 ## 🚧 Roadmap
 

@@ -101,8 +101,9 @@ export default async function CampaignPage({ params }: PageProps) {
   // Fetch pending invitations for display in Members tab
   const { data: invitations } = await supabase
     .from('campaign_invitations')
-    .select('id, email, role, token, accepted, created_at')
+    .select('id, email, role, token, accepted, created_at, expires_at')
     .eq('campaign_id', id)
+    .eq('accepted', false) // Only show pending invitations
     .order('created_at', { ascending: true })
 
   const invitationsList = invitations || []

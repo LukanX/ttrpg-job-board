@@ -34,6 +34,11 @@ describe('Invitation accept API', () => {
 
     expect((res as any).status).toBe(200)
     expect((res as any).body).toEqual({ ok: true })
+    
+    // Verify that update was called to mark as accepted (soft delete)
+    expect(fakeSupabase.from('campaign_invitations').update).toHaveBeenCalledWith(
+      expect.objectContaining({ accepted: true, invited_user_id: 'user-1' })
+    )
   })
 
   test('returns 403 when signed-in user email does not match invitation', async () => {
