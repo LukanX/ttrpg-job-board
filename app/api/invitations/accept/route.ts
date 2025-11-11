@@ -1,5 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
+import { createClient as createServiceClient } from '@supabase/supabase-js'
+
+// Service role client for bypassing RLS when adding members
+const getServiceClient = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY
+  
+  if (!url || !key) {
+    throw new Error('Missing Supabase credentials')
+  }
+  
+  return createServiceClient(url, key, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false,
+    },
+  })
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -48,28 +66,37 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: true })
     }
 
-    // Add member (ignore duplicate errors)
-    try {
-      await supabase.from('campaign_members').insert({
+    // Use service role to bypass RLS for adding member
+    const serviceClient = getServiceClient()
+    
+    // Add member (use service role to bypass RLS)
+    const { error: insertError } = await serviceClient
+      .from('campaign_members')
+      .insert({
         campaign_id: invitation.campaign_id,
         user_id: user.id,
         role: invitation.role,
       })
-    } catch (err) {
-      // swallow insert errors (e.g., already a member) and continue
-      console.warn('campaign_members insert warning (non-fatal):', err)
+
+    if (insertError) {
+      // Check if it's a duplicate (user already a member)
+      if (insertError.code === '23505') {
+        console.log('User already a member, continuing to mark invitation accepted')
+      } else {
+        console.error('Failed to add campaign member:', insertError)
+        return NextResponse.json({ error: 'Failed to add member to campaign' }, { status: 500 })
+      }
     }
 
-    // Mark invitation as accepted (soft delete - keeps audit trail)
-    const updateRes = await supabase
+    // Mark invitation as accepted (use service role to ensure it works)
+    const { error: updateErr } = await serviceClient
       .from('campaign_invitations')
       .update({ accepted: true, invited_user_id: user.id, accepted_at: new Date().toISOString() })
       .eq('id', invitation.id)
-    const updateErr = updateRes?.error
 
     if (updateErr) {
       console.error('Failed to mark invitation accepted:', updateErr)
-      // non-fatal for UX — still return ok
+      return NextResponse.json({ error: 'Failed to mark invitation as accepted' }, { status: 500 })
     }
 
     return NextResponse.json({ ok: true })
