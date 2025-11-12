@@ -4,13 +4,8 @@
 -- Enable RLS (no-op if already enabled)
 ALTER TABLE IF EXISTS public.campaign_members ENABLE ROW LEVEL SECURITY;
 
--- Drop existing policy if present
-DO $$
-BEGIN
-  IF EXISTS (SELECT 1 FROM pg_policies WHERE polname = 'member_update_character_only' AND polrelid = 'public.campaign_members'::regclass) THEN
-    EXECUTE 'DROP POLICY member_update_character_only ON public.campaign_members';
-  END IF;
-END$$;
+-- Drop existing policy if present (use portable DROP IF EXISTS)
+DROP POLICY IF EXISTS member_update_character_only ON public.campaign_members;
 
 -- Policy: allow authenticated user to UPDATE only their own row
 CREATE POLICY member_update_character_only
