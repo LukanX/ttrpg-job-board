@@ -46,8 +46,8 @@ describe('CampaignMembers component', () => {
 
     await waitFor(() => expect(screen.getByText('U1')).toBeInTheDocument())
     expect(screen.getByText('u1@example.com')).toBeInTheDocument()
-    // Invite form present
-    expect(screen.getByPlaceholderText(/invite by email/i)).toBeInTheDocument()
+  // Invite form present
+  expect(screen.getByPlaceholderText(/email@example.com/i)).toBeInTheDocument()
   })
 
   test('invite flow posts and refreshes list', async () => {
@@ -68,10 +68,11 @@ describe('CampaignMembers component', () => {
 
     await waitFor(() => expect(screen.getByText('U1')).toBeInTheDocument())
 
-    fireEvent.change(screen.getByPlaceholderText(/invite by email/i), { target: { value: 'new@example.com' } })
+  fireEvent.change(screen.getByPlaceholderText(/email@example.com/i), { target: { value: 'new@example.com' } })
     fireEvent.change(screen.getByDisplayValue('co-gm'), { target: { value: 'co-gm' } })
 
-    fireEvent.click(screen.getByText(/invite/i))
+  // Click the specific send-invite button
+  fireEvent.click(screen.getByRole('button', { name: /send email invite/i }))
 
     // Wait for invite to complete. Component will call router.refresh() to re-load server data.
     await waitFor(() => expect((useRouter() as any).refresh).toHaveBeenCalled())
