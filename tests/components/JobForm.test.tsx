@@ -219,4 +219,74 @@ describe('JobForm', () => {
 
     expect(mockRouter.back).toHaveBeenCalled()
   })
+
+  it('creates inline organization and mission type then job', async () => {
+    const mockSupabase = {
+      auth: {
+        getUser: jest.fn().mockResolvedValue({ data: { user: { id: 'user-1' } } }),
+      },
+      from: jest.fn((table: string) => {
+        if (table === 'organizations') {
+          return {
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({ data: { id: 'org-new' }, error: null }),
+              }),
+            }),
+          }
+        }
+
+        if (table === 'mission_types') {
+          return {
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({ data: { id: 'mt-new' }, error: null }),
+              }),
+            }),
+          }
+        }
+
+        if (table === 'jobs') {
+          return {
+            insert: jest.fn().mockReturnValue({
+              select: jest.fn().mockReturnValue({
+                single: jest.fn().mockResolvedValue({ data: { id: 'job-new' }, error: null }),
+              }),
+            }),
+          }
+        }
+
+        return { insert: jest.fn() }
+      }),
+    }
+
+    ;(createClient as jest.Mock).mockReturnValue(mockSupabase)
+
+    render(
+      <JobForm campaignId="campaign-1" organizations={mockOrganizations} missionTypes={mockMissionTypes} />
+    )
+
+    // Fill basic fields
+    fireEvent.change(screen.getByLabelText(/job title/i), { target: { value: 'Inline Job' } })
+    fireEvent.change(screen.getByLabelText(/description/i), { target: { value: 'Inline description' } })
+
+    // Select create new organization
+    fireEvent.change(screen.getByLabelText(/organization/i), { target: { value: '__new__' } })
+    // New org inputs should appear
+    expect(screen.getByPlaceholderText(/organization name/i)).toBeInTheDocument()
+    fireEvent.change(screen.getByPlaceholderText(/organization name/i), { target: { value: 'New Org' } })
+
+    // Select create new mission type
+    fireEvent.change(screen.getByLabelText(/mission type/i), { target: { value: '__new__' } })
+    expect(screen.getByPlaceholderText(/mission type name/i)).toBeInTheDocument()
+    fireEvent.change(screen.getByPlaceholderText(/mission type name/i), { target: { value: 'New Mission' } })
+
+    // Submit
+    const submitButton = screen.getByText('Create Job')
+    fireEvent.click(submitButton)
+
+    await waitFor(() => {
+      expect(mockRouter.push).toHaveBeenCalledWith('/gm/campaigns/campaign-1/jobs/job-new')
+    })
+  })
 })

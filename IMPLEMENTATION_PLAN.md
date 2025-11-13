@@ -102,7 +102,7 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - ✅ Delete job (cascade to encounters/NPCs)
 - ✅ Change job status (active → completed → archived)
 - [ ] Regenerate job with LLM
-- [ ] Manual job creation (without LLM)
+- ✅ Manual job creation (without LLM)
 - [ ] Bulk job operations
 
 ### Priority 2: GM Tools & Analytics
