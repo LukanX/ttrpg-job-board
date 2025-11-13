@@ -3,23 +3,23 @@
 export type SupabaseRow<T = unknown> = { data: T | null; error: unknown | null }
 
 export type SupabaseChain<T = unknown> = {
-  select: jest.MockedFunction<() => SupabaseChain<T>>
-  eq: jest.MockedFunction<() => SupabaseChain<T>>
-  order: jest.MockedFunction<() => SupabaseChain<T>>
-  update: jest.MockedFunction<() => SupabaseChain<T>>
-  insert: jest.MockedFunction<() => SupabaseChain<T>>
-  delete: jest.MockedFunction<() => SupabaseChain<T>>
+  select: jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>
+  eq: jest.MockedFunction<(column: string, value?: unknown) => SupabaseChain<T>>
+  order: jest.MockedFunction<(column?: string, options?: unknown) => SupabaseChain<T>>
+  update: jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>
+  insert: jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>
+  delete: jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>
   single: jest.Mock<Promise<SupabaseRow<T>>, []>
 }
 
 export function createChain<T = unknown>(singleResponses: Array<SupabaseRow<T>> = []): SupabaseChain<T> {
   const chainPartial: Partial<SupabaseChain<T>> = {
-    select: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<() => SupabaseChain<T>>,
-    eq: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<() => SupabaseChain<T>>,
-    order: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<() => SupabaseChain<T>>,
-    update: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<() => SupabaseChain<T>>,
-    insert: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<() => SupabaseChain<T>>,
-    delete: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<() => SupabaseChain<T>>,
+    select: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>,
+    eq: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<(column: string, value?: unknown) => SupabaseChain<T>>,
+    order: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<(column?: string, options?: unknown) => SupabaseChain<T>>,
+    update: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>,
+    insert: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>,
+    delete: jest.fn().mockReturnThis() as unknown as jest.MockedFunction<(...args: any[]) => SupabaseChain<T>>,
     single: jest.fn().mockImplementation(() => Promise.resolve(singleResponses.shift())) as unknown as jest.Mock<Promise<SupabaseRow<T>>, []>,
   }
 
