@@ -1,17 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { createClient } from '@supabase/supabase-js'
-
-// Use service role to run cleanup functions
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-)
+import { createAdminClient } from '@/lib/supabase/admin'
 
 /**
  * POST /api/admin/cleanup-invitations
@@ -32,6 +20,15 @@ export async function POST(request: NextRequest) {
     if (expectedKey && authHeader !== `Bearer ${expectedKey}`) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
+
+  // Create service role client (bypasses RLS for cleanup)
+  let supabaseAdmin
+  try {
+    supabaseAdmin = createAdminClient()
+  } catch (err) {
+    console.error('Failed to create Supabase service client:', err)
+    return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
+  }
 
   // Call the cleanup function
   const { error } = await supabaseAdmin.rpc('run_invitation_cleanup')

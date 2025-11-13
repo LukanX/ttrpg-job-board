@@ -7,6 +7,10 @@ const UpdateCharacterSchema = z.object({
   characterName: z.string().max(100).nullable(),
 })
 
+// No service-role client here: rely on DB RLS + trigger to allow a member
+// to update only their own character_name. This avoids using the service
+// key and enforces auth at the database layer.
+
 /**
  * PATCH /api/campaigns/[id]/members/me/character
  * Update the current user's character name for this campaign
@@ -38,34 +42,30 @@ export async function PATCH(
 
     const { characterName } = parse.data
 
-    // Find user's membership in this campaign
-    const { data: membership, error: membershipError } = await supabase
-      .from('campaign_members')
-      .select('id, character_name')
-      .eq('campaign_id', campaignId)
-      .eq('user_id', user.id)
-      .single()
-
-    if (membershipError || !membership) {
-      return NextResponse.json(
-        { error: 'You are not a member of this campaign' },
-        { status: 403 }
-      )
-    }
-
-    // Update character name
+    // Update using the session-bound server client. With the RLS policy and
+    // trigger in place, the DB will allow the update only when
+    // user_id = auth.uid() and will prevent changes to sensitive columns.
     const { data: updated, error: updateError } = await supabase
       .from('campaign_members')
       .update({ character_name: characterName || null })
-      .eq('id', membership.id)
+      .eq('campaign_id', campaignId)
+      .eq('user_id', user.id)
       .select('id, character_name')
-      .single()
+      .maybeSingle()
 
     if (updateError) {
       console.error('Error updating character name:', updateError)
       return NextResponse.json(
         { error: 'Failed to update character name' },
         { status: 500 }
+      )
+    }
+
+    if (!updated) {
+      // No row updated => user is not a member of this campaign
+      return NextResponse.json(
+        { error: 'You are not a member of this campaign' },
+        { status: 403 }
       )
     }
 

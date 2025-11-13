@@ -1,7 +1,8 @@
-# GitHub Copilot Instructions - Starfinder 2E Job Board
+# AI Rules for Starfinder 2E Job Board
 
-## Project Overview
 This is an LLM-powered job board for TTRPGs, with the MVP being focused on Starfinder 2E. GMs can manage campaigns and generate AI-powered job postings, while players can view and vote on missions via shared links.
+
+## CODING_PRACTICES
 
 ## Task Planning and Problem Solving
 
@@ -13,47 +14,147 @@ This is an LLM-powered job board for TTRPGs, with the MVP being focused on Starf
   or re-configure any existing code to achieve the result.
 
 
-## Technology Stack
+### Guidelines for SUPPORT_LEVEL
 
-### Core Framework & Versions
-- **Next.js**: 16.x (latest stable, App Router)
-- **React**: 19.x (latest stable)
-- **TypeScript**: 5.x (latest stable)
-- **Node.js**: 20.x LTS or higher
-- **Tailwind CSS**: 4.x (latest stable)
-- **shadcn/ui**: Latest version for pre-built components
+#### SUPPORT_BEGINNER
+
+- When running in agent mode, execute up to 3 actions at a time and ask for approval or course correction afterwards.
+- Write code with clear variable names and include explanatory comments for non-obvious logic. Avoid shorthand syntax and complex patterns.
+- Provide full implementations rather than partial snippets. Include import statements, required dependencies, and initialization code.
+- Add defensive coding patterns and clear error handling. Include validation for user inputs and explicit type checking.
+- Suggest simpler solutions first, then offer more optimized versions with explanations of the trade-offs.
+- Briefly explain why certain approaches are used and link to relevant documentation or learning resources.
+- When suggesting fixes for errors, explain the root cause and how the solution addresses it to build understanding. Ask for confirmation before proceeding.
+- Offer introducing basic test cases that demonstrate how the code works and common edge cases to consider.
+- Consider performance, security, and maintainability
 
 
-### Database & Backend
+### Guidelines for VERSION_CONTROL
+
+#### GIT
+
+- Use conventional commits to create meaningful commit messages
+- Use feature branches with descriptive names following {{branch_naming_convention}}
+- Write meaningful commit messages that explain why changes were made, not just what
+- Keep commits focused on single logical changes to facilitate code review and bisection
+- Use interactive rebase to clean up history before merging feature branches
+- Leverage git hooks to enforce code quality checks before commits and pushes
+
+#### GITHUB
+
+- Use pull request templates to standardize information provided for code reviews
+- Implement branch protection rules for {{protected_branches}} to enforce quality checks
+- Configure required status checks to prevent merging code that fails tests or linting
+- Use GitHub Actions for CI/CD workflows to automate testing and deployment
+- Implement CODEOWNERS files to automatically assign reviewers based on code paths
+- Use GitHub Projects for tracking work items and connecting them to code changes
+
+## FRONTEND
+
+### Guidelines for REACT
+
+#### REACT_CODING_STANDARDS
+
+- Use functional components with hooks instead of class components
+- Implement React.memo() for expensive components that render often with the same props
+- Utilize React.lazy() and Suspense for code-splitting and performance optimization
+- Use the useCallback hook for event handlers passed to child components to prevent unnecessary re-renders
+- Prefer useMemo for expensive calculations to avoid recomputation on every render
+- Implement useId() for generating unique IDs for accessibility attributes
+- Use the new use hook for data fetching in React 19+ projects
+- Leverage Server Components for {{data_fetching_heavy_components}} when using React with Next.js or similar frameworks
+- Consider using the new useOptimistic hook for optimistic UI updates in forms
+- Use useTransition for non-urgent state updates to keep the UI responsive
+
+#### NEXT_JS
+
+- Use App Router and Server Components for improved performance and SEO
+- Implement route handlers for API endpoints instead of the pages/api directory
+- Use server actions for form handling and data mutations from Server Components
+- Leverage Next.js Image component with proper sizing for core web vitals optimization
+- Implement the Metadata API for dynamic SEO optimization
+- Use React Server Components for {{data_fetching_operations}} to reduce client-side JavaScript
+- Implement Streaming and Suspense for improved loading states
+- Use the new Link component without requiring a child <a> tag
+- Leverage parallel routes for complex layouts and parallel data fetching
+- Implement intercepting routes for modal patterns and nested UIs
+
+
+### Guidelines for STYLING
+
+#### TAILWIND
+
+- Use the @layer directive to organize styles into components, utilities, and base layers
+- Implement Just-in-Time (JIT) mode for development efficiency and smaller CSS bundles
+- Use arbitrary values with square brackets (e.g., w-[123px]) for precise one-off designs
+- Leverage the @apply directive in component classes to reuse utility combinations
+- Implement the Tailwind configuration file for customizing theme, plugins, and variants
+- Use component extraction for repeated UI patterns instead of copying utility classes
+- Leverage the theme() function in CSS for accessing Tailwind theme values
+- Implement dark mode with the dark: variant
+- Use responsive variants (sm:, md:, lg:, etc.) for adaptive designs
+- Leverage state variants (hover:, focus:, active:, etc.) for interactive elements
+
+## DATABASE
 - **Supabase**: PostgreSQL-based backend with Auth, Realtime, and Storage
 - **Supabase CLI**: For managing database schema and migrations
 
-### Testing: Jest
+### Database & Supabase
+- Use **Row Level Security (RLS)** for all tables
+- Create migrations for schema changes
+- Use Supabase client for browser, server client for API routes/server components
+- Type database responses using generated types
+- Handle loading and error states for all queries
 
-**Testing Guidelines:**
-- Write comprehensive unit tests for all business logic
-- Follow the AAA pattern: Arrange, Act, Assert
-- Maintain good test coverage (aim for 80%+ for critical paths)
-- Write descriptive test names that explain the expected behavior
-- Use test doubles (mocks, stubs, spies) appropriately
-- Implement integration tests for API endpoints and user flows
-- Keep tests fast, isolated, and deterministic
- - Use typed test helpers for common patterns (e.g., `tests/helpers/consoleSpy.ts`) to standardize mocks/spies and keep tests quiet while allowing assertions on logs
- - Prefer asserting on logged errors (with a spy) rather than only silencing them when the log is part of the behavior under test
+### Guidelines for SQL
 
-## AI Code Generation Preferences
+#### POSTGRES
 
-When generating code, please:
+- Use connection pooling to manage database connections efficiently
+- Implement JSONB columns for semi-structured data instead of creating many tables for {{flexible_data}}
+- Use materialized views for complex, frequently accessed read-only data
 
-- Generate complete, working code examples with proper imports
-- Include inline comments for complex logic and business rules
-- Follow the established patterns and conventions in this project
-- Suggest improvements and alternative approaches when relevant
-- Consider performance, security, and maintainability
-- Include error handling and edge case considerations
-- Generate appropriate unit tests when creating new functions
-- Follow accessibility best practices for UI components
-- Use semantic HTML and proper ARIA attributes when applicable
+## DEVOPS
+
+### Guidelines for CONTAINERIZATION
+
+#### DOCKER
+
+- Use multi-stage builds to create smaller production images
+- Implement layer caching strategies to speed up builds for {{dependency_types}}
+- Use non-root users in containers for better security
+
+
+### Guidelines for CI_CD
+
+#### GITHUB_ACTIONS
+
+- Check if `package.json` exists in project root and summarize key scripts
+- Check if `.nvmrc` exists in project root
+- Check if `.env.example` exists in project root to identify key `env:` variables
+- Always use terminal command: `git branch -a | cat` to verify whether we use `main` or `master` branch
+- Always use `env:` variables and secrets attached to jobs instead of global workflows
+- Always use `npm ci` for Node-based dependency setup
+- Extract common steps into composite actions in separate files
+- Once you're done, as a final step conduct the following: for each public action always use <tool>"Run Terminal"</tool> to see what is the most up-to-date version (use only major version) - extract tag_name from the response:
+- ```bash curl -s https://api.github.com/repos/{owner}/{repo}/releases/latest ```
+
+## TESTING
+
+### Guidelines for UNIT
+
+#### JEST
+
+- Use Jest with TypeScript for type checking in tests
+- Implement Testing Library for component testing instead of enzyme
+- Use snapshot testing sparingly and only for stable UI components
+- Leverage mock functions and spies for isolating units of code
+- Implement test setup and teardown with beforeEach and afterEach
+- Use describe blocks for organizing related tests
+- Leverage expect assertions with specific matchers
+- Implement code coverage reporting with meaningful targets
+- Use mockResolvedValue and mockRejectedValue for async testing
+- Leverage fake timers for testing time-dependent functionality
 
 ## Project Structure
 
@@ -134,49 +235,13 @@ job-board/
 └── IMPLEMENTATION_PLAN.md
 ```
 
-## Coding Standards & Best Practices
-
-### TypeScript
-- Use strict mode (`"strict": true` in tsconfig.json)
-- Define explicit types for all function parameters and return values
-- Use interfaces for object shapes, types for unions/primitives
-- Avoid `any` - use `unknown` if type is truly unknown
-
-### React & Next.js
-- Use **Server Components** by default
-- Add `'use client'` directive only when needed (forms, interactivity, hooks)
-- Use **Server Actions** for mutations instead of API routes where appropriate
-- Implement proper loading.tsx and error.tsx files
-- Use Next.js Image component for all images
-- Implement proper metadata for SEO
-
+## Coding Standards
 ### Code Organization
 - **One component per file** with clear naming
 - **Co-locate related files**: keep components near their usage
 - **Barrel exports**: use index.ts files for cleaner imports
 - **Custom hooks**: extract reusable logic into hooks/
 - **Type safety**: define all database types from Supabase schema
-
-### Styling
-- Use **Tailwind CSS** utility classes
-- Use **clsx** or **cn** helper for conditional classes
-- Follow mobile-first responsive design
-- Use Tailwind's color palette (avoid custom colors initially)
-- Implement dark mode support using Tailwind's dark: variant
-
-### State Management
-- Use **React Server Components** for server state
-- Use **useState/useReducer** for local component state
-- Use **React Context** for shared UI state (theme, modals)
-- Use **Supabase Realtime** for live updates (votes)
-- Avoid prop drilling - lift state appropriately
-
-### Database & Supabase
-- Use **Row Level Security (RLS)** for all tables
-- Create migrations for schema changes
-- Use Supabase client for browser, server client for API routes/server components
-- Type database responses using generated types
-- Handle loading and error states for all queries
 
 ### LLM Integration
 - Use **streaming responses** for better UX
@@ -207,12 +272,6 @@ job-board/
 - Log errors appropriately (avoid sensitive data)
 - Implement error boundaries for React components
 - Show loading states during async operations
-
-### Testing (Future Phase)
-- Unit tests for utility functions
-- Integration tests for API routes
-- E2E tests for critical user flows
-- Test LLM prompts with mock responses
 
 ## Database Schema Reference
 
@@ -249,24 +308,6 @@ job-board/
 - Include motivations and secrets
 
 ## Environment Variables
-
-```env
-# Supabase
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-
-# LLM API
-OPENAI_API_KEY=your_openai_key
-# OR
-GROQ_API_KEY=your_groq_key
-# OR
-GOOGLE_AI_API_KEY=your_gemini_key
-
-# App
-NEXT_PUBLIC_APP_URL=http://localhost:3000
-```
-
 ## Development Workflow
 
 1. **Start with Database**: Define Supabase schema first
@@ -277,18 +318,6 @@ NEXT_PUBLIC_APP_URL=http://localhost:3000
 6. **Test Thoroughly**: Verify all flows work end-to-end
 7. **Deploy to Vercel**: Connect GitHub repo for auto-deployments
 
-## Phase 1 MVP Checklist
-
-- [x] Next.js project setup with TypeScript and Tailwind
-- [x] Supabase project created and schema defined
-- [x] Authentication implemented (Supabase Auth)
-- [ ] GM dashboard with campaign CRUD
-- [ ] Organization and mission type management
-- [x] LLM job generation endpoint
-- [x] Share link functionality
-- [x] Player view with job listing
-- [x] Voting system with real-time updates
-- [ ] Basic error handling and loading states
 
 ## Common Patterns
 

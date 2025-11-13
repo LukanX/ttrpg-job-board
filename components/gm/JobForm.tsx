@@ -28,6 +28,14 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
     mission_type_id: job?.mission_type_id || '',
   })
 
+  const [showNewOrganization, setShowNewOrganization] = useState(false)
+  const [newOrganizationName, setNewOrganizationName] = useState('')
+  const [newOrganizationDescription, setNewOrganizationDescription] = useState('')
+
+  const [showNewMissionType, setShowNewMissionType] = useState(false)
+  const [newMissionTypeName, setNewMissionTypeName] = useState('')
+  const [newMissionTypeDescription, setNewMissionTypeDescription] = useState('')
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setError(null)
@@ -68,6 +76,34 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           throw new Error('Not authenticated')
         }
 
+        let organizationId = formData.organization_id || null
+        let missionTypeId = formData.mission_type_id || null
+
+        // If user opted to create a new organization inline, create it first
+        if (formData.organization_id === '__new__') {
+          if (!newOrganizationName.trim()) throw new Error('Organization name is required')
+          const { data: orgData, error: orgError } = await supabase
+            .from('organizations')
+            .insert({ campaign_id: campaignId, name: newOrganizationName.trim(), description: newOrganizationDescription || null })
+            .select()
+            .single()
+
+          if (orgError) throw orgError
+          organizationId = orgData.id
+        }
+
+        // If user opted to create a new mission type inline, create it first
+        if (formData.mission_type_id === '__new__') {
+          if (!newMissionTypeName.trim()) throw new Error('Mission type name is required')
+          const { data: mtData, error: mtError } = await supabase
+            .from('mission_types')
+            .insert({ campaign_id: campaignId, name: newMissionTypeName.trim(), description: newMissionTypeDescription || null })
+            .select()
+            .single()
+
+          if (mtError) throw mtError
+          missionTypeId = mtData.id
+        }
         const { data, error: insertError } = await supabase
           .from('jobs')
           .insert({
@@ -78,8 +114,8 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
             reward: formData.reward || null,
             status: formData.status,
             gm_notes: formData.gm_notes || null,
-            organization_id: formData.organization_id || null,
-            mission_type_id: formData.mission_type_id || null,
+            organization_id: organizationId,
+            mission_type_id: missionTypeId,
             created_by: user.id,
           })
           .select()
@@ -149,16 +185,40 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           <select
             id="organization"
             value={formData.organization_id}
-            onChange={(e) => setFormData({ ...formData, organization_id: e.target.value })}
+            onChange={(e) => {
+              const v = e.target.value
+              setFormData({ ...formData, organization_id: v })
+              if (v === '__new__') setShowNewOrganization(true)
+              else setShowNewOrganization(false)
+            }}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">None</option>
+            <option value="__new__">+ Create new organization...</option>
             {organizations.map((org) => (
               <option key={org.id} value={org.id}>
                 {org.name}
               </option>
             ))}
           </select>
+          {showNewOrganization && (
+            <div className="mt-3 space-y-2">
+              <input
+                type="text"
+                placeholder="Organization name"
+                value={newOrganizationName}
+                onChange={(e) => setNewOrganizationName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+              <input
+                type="text"
+                placeholder="Short description (optional)"
+                value={newOrganizationDescription}
+                onChange={(e) => setNewOrganizationDescription(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+          )}
         </div>
 
         <div>
@@ -168,16 +228,40 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           <select
             id="missionType"
             value={formData.mission_type_id}
-            onChange={(e) => setFormData({ ...formData, mission_type_id: e.target.value })}
+            onChange={(e) => {
+              const v = e.target.value
+              setFormData({ ...formData, mission_type_id: v })
+              if (v === '__new__') setShowNewMissionType(true)
+              else setShowNewMissionType(false)
+            }}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <option value="">None</option>
+            <option value="__new__">+ Create new mission type...</option>
             {missionTypes.map((type) => (
               <option key={type.id} value={type.id}>
                 {type.name}
               </option>
             ))}
           </select>
+          {showNewMissionType && (
+            <div className="mt-3 space-y-2">
+              <input
+                type="text"
+                placeholder="Mission type name"
+                value={newMissionTypeName}
+                onChange={(e) => setNewMissionTypeName(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+              <input
+                type="text"
+                placeholder="Short description (optional)"
+                value={newMissionTypeDescription}
+                onChange={(e) => setNewMissionTypeDescription(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md"
+              />
+            </div>
+          )}
         </div>
       </div>
 

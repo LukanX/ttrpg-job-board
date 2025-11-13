@@ -79,7 +79,7 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - [ ] Delete campaign (with confirmation)
 - [ ] Archive/restore campaigns
 - [ ] Campaign settings page
- - [ ] Campaign member management UI (invite / remove / change roles for co-GMs)
+ - ✅ Campaign member management UI (invite / remove / change roles for co-GMs)
    - Create `components/gm/CampaignMembers.tsx` (client component)
    - Wire into `app/gm/campaigns/[id]/page.tsx` and gate visibility to owners/co-GMs
    - Features: list members, invite by email, change role, remove member, confirmation modal
@@ -87,22 +87,22 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
    - Estimated effort: 3-6 hours (MVP)
 
 #### 1.2 Organizations
-- [ ] Edit organization details
-- [ ] Delete organization (check for dependent jobs)
+- ✅ Edit organization details
+- ✅ Delete organization (check for dependent jobs)
 - [ ] Organization detail view
 - [ ] Track jobs per organization
 
 #### 1.3 Mission Types
-- [ ] Edit mission type
-- [ ] Delete mission type (check dependencies)
+- ✅ Edit mission type
+- ✅ Delete mission type (check dependencies)
 - [ ] Add/remove tags dynamically
 
 #### 1.4 Jobs Management
 - ✅ Edit job (title, description, status)
-- [ ] Delete job (cascade to encounters/NPCs)
+- ✅ Delete job (cascade to encounters/NPCs)
 - ✅ Change job status (active → completed → archived)
-- [ ] Regenerate job with LLM
-- [ ] Manual job creation (without LLM)
+- ✅ Regenerate job with LLM (full regeneration with confirmation)
+- ✅ Manual job creation (without LLM)
 - [ ] Bulk job operations
 
 ### Priority 2: GM Tools & Analytics
@@ -174,6 +174,10 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - [ ] Multiple job generation (batch)
 - [ ] AI plot twist generator
 - [ ] Session recap generator
+- [ ] Advanced job regeneration options:
+  - [ ] Partial regeneration (encounters only, NPCs only)
+  - [ ] "Remix" mode (regenerate with existing content as context)
+  - [ ] Keep specific elements while regenerating others
 
 ### 3.2 Campaign Progression
 - [ ] Mark jobs as completed

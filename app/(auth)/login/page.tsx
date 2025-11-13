@@ -1,92 +1,21 @@
 'use client'
 
-import { useState } from 'react'
-import { useRouter } from 'next/navigation'
+import { useState, useTransition } from 'react'
 import Link from 'next/link'
-import { createClient } from '@/lib/supabase/client'
+import { login } from './actions'
 
 export default function LoginPage() {
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
   const [error, setError] = useState<string | null>(null)
-  const [loading, setLoading] = useState(false)
-  const router = useRouter()
-  const supabase = createClient()
+  const [isPending, startTransition] = useTransition()
 
-  const handleLogin = async (e: React.FormEvent) => {
-    e.preventDefault()
+  const handleSubmit = async (formData: FormData) => {
     setError(null)
-    setLoading(true)
-
-    try {
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      })
-
-      if (signInError) throw signInError
-
-      if (!data.user) {
-        throw new Error('No user data returned')
+    startTransition(async () => {
+      const result = await login(formData)
+      if (result?.error) {
+        setError(result.error)
       }
-
-      // Check if user profile exists, create if not
-      const { data: initialUserData, error: initialUserError } = await supabase
-        .from('users')
-        .select('role')
-        .eq('id', data.user.id)
-        .single()
-      let userData = initialUserData
-      const userError = initialUserError
-
-      // If user profile doesn't exist, create it
-      if (userError && userError.code === 'PGRST116') {
-        const displayName = data.user.user_metadata?.display_name || data.user.email?.split('@')[0] || 'User'
-        const role = data.user.user_metadata?.role || 'player'
-        
-        const { error: createError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email!,
-            display_name: displayName,
-            role: role,
-          })
-        
-        if (createError) {
-          console.error('Failed to create user profile:', createError)
-          throw new Error('Failed to create user profile. Please contact support.')
-        }
-        
-        // Fetch the newly created profile
-        const { data: newUserData, error: fetchError } = await supabase
-          .from('users')
-          .select('role')
-          .eq('id', data.user.id)
-          .single()
-        
-        if (fetchError) throw fetchError
-        userData = newUserData
-      } else if (userError) {
-        throw userError
-      }
-
-      if (!userData) {
-        throw new Error('Failed to load user profile')
-      }
-
-      // Redirect based on role
-      if (userData.role === 'gm') {
-        router.push('/gm/dashboard')
-      } else {
-        router.push('/')
-      }
-      router.refresh()
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to log in')
-    } finally {
-      setLoading(false)
-    }
+    })
   }
 
   return (
@@ -103,10 +32,20 @@ export default function LoginPage() {
             </Link>
           </p>
         </div>
-        <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+        <form className="mt-8 space-y-6" action={handleSubmit}>
           {error && (
-            <div className="rounded-md bg-red-50 p-4">
-              <div className="text-sm text-red-800">{error}</div>
+            <div className="rounded-md bg-red-50 border border-red-400 p-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  <svg className="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
+                    <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <h3 className="text-sm font-medium text-red-800">Login Error</h3>
+                  <div className="mt-2 text-sm text-red-700">{error}</div>
+                </div>
+              </div>
             </div>
           )}
           <div className="rounded-md shadow-sm -space-y-px">
@@ -120,8 +59,6 @@ export default function LoginPage() {
                 type="email"
                 autoComplete="email"
                 required
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-t-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Email address"
               />
@@ -136,8 +73,6 @@ export default function LoginPage() {
                 type="password"
                 autoComplete="current-password"
                 required
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
                 className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                 placeholder="Password"
               />
@@ -147,10 +82,10 @@ export default function LoginPage() {
           <div>
             <button
               type="submit"
-              disabled={loading}
+              disabled={isPending}
               className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {loading ? 'Signing in...' : 'Sign in'}
+              {isPending ? 'Signing in...' : 'Sign in'}
             </button>
           </div>
         </form>

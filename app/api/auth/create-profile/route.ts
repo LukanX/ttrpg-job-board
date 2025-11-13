@@ -1,17 +1,5 @@
-import { createClient } from '@supabase/supabase-js'
 import { NextRequest, NextResponse } from 'next/server'
-
-// Use service role to bypass RLS for user creation
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  {
-    auth: {
-      autoRefreshToken: false,
-      persistSession: false,
-    },
-  }
-)
+import { createAdminClient } from '@/lib/supabase/admin'
 
 export async function POST(request: NextRequest) {
   try {
@@ -30,6 +18,15 @@ export async function POST(request: NextRequest) {
         { error: 'Invalid role' },
         { status: 400 }
       )
+    }
+
+    // Create service role client (bypasses RLS for this request)
+    let supabaseAdmin
+    try {
+      supabaseAdmin = createAdminClient()
+    } catch (err) {
+      console.error('Failed to create Supabase service client:', err)
+      return NextResponse.json({ error: 'Server configuration error' }, { status: 500 })
     }
 
     // Create user profile using admin client (bypasses RLS)

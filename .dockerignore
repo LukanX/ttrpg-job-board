@@ -1,0 +1,12 @@
+.next
+node_modules
+dist
+build
+.env
+.env.local
+.env.*.local
+.git
+tmp
+tests
+coverage
+public/.well-known
