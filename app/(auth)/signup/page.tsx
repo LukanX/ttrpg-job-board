@@ -63,13 +63,13 @@ export default function SignupPage() {
 
       // Check if email confirmation is required
       if (data.session) {
-        // Auto-confirmed, redirect immediately
+        // Auto-confirmed, redirect immediately with full page reload
+        // This ensures middleware runs and session cookies are properly set
         if (role === 'gm') {
-          router.push('/gm/dashboard')
+          window.location.href = '/gm/dashboard'
         } else {
-          router.push('/')
+          window.location.href = '/'
         }
-        router.refresh()
       } else {
         // Email confirmation required - show success message
         setSuccess('Account created! Please check your email to confirm your account.')

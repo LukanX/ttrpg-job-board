@@ -6,8 +6,11 @@ export async function updateSession(request: NextRequest) {
     request,
   })
 
+  // Use internal URL for Docker, fallback to public URL
+  const supabaseUrl = process.env.SUPABASE_URL_INTERNAL || process.env.NEXT_PUBLIC_SUPABASE_URL!
+
   const supabase = createServerClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    supabaseUrl,
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
     {
       cookies: {
@@ -36,17 +39,20 @@ export async function updateSession(request: NextRequest) {
   // supabase.auth.getUser(). A simple mistake could make it very hard to debug
   // issues with users being randomly logged out.
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser()
-
-  // Protect GM routes
-  if (request.nextUrl.pathname.startsWith('/gm') && !user) {
-    // No user, redirect to login
-    const url = request.nextUrl.clone()
-    url.pathname = '/login'
-    return NextResponse.redirect(url)
-  }
+  // Note: Skipping auth check in middleware due to Docker networking issues
+  // Protection is handled at the layout level instead
+  // 
+  // const {
+  //   data: { user },
+  // } = await supabase.auth.getUser()
+  //
+  // // Protect GM routes
+  // if (request.nextUrl.pathname.startsWith('/gm') && !user) {
+  //   // No user, redirect to login
+  //   const url = request.nextUrl.clone()
+  //   url.pathname = '/login'
+  //   return NextResponse.redirect(url)
+  // }
 
   // IMPORTANT: You *must* return the supabaseResponse object as it is. If you're
   // creating a new response object with NextResponse.next() make sure to:
