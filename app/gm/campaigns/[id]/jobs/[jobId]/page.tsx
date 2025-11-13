@@ -3,6 +3,7 @@ import { notFound, redirect } from 'next/navigation'
 import Link from 'next/link'
 import { Edit } from 'lucide-react'
 import DeleteJobButton from '@/components/gm/DeleteJobButton'
+import RegenerateJobButton from '@/components/gm/RegenerateJobButton'
 import type { Job, Organization, MissionType, Encounter, NPC } from '@/types/database'
 
 interface Props {
@@ -37,18 +38,18 @@ export default async function JobDetailPage({ params }: Props) {
     notFound()
   }
 
-  // Fetch campaign to verify ownership
+  // Fetch campaign to verify access
   const { data: campaign } = await supabase
     .from('campaigns')
     .select('gm_id')
     .eq('id', campaignId)
     .single()
 
-  // Check permissions for edit button visibility
-  const isCreator = job.created_by === user.id
-  const isOwner = campaign?.gm_id === user.id
+  if (!campaign) {
+    notFound()
+  }
 
-  // Check if user is a co-GM
+  // Check if user is a member
   const { data: membership } = await supabase
     .from('campaign_members')
     .select('role')
@@ -56,16 +57,29 @@ export default async function JobDetailPage({ params }: Props) {
     .eq('user_id', user.id)
     .single()
 
+  // Check permissions
+  const isCreator = job.created_by === user.id
+  const isOwner = campaign.gm_id === user.id
   const isCoGM = membership?.role === 'co-gm'
-  const canEdit = isCreator || isOwner || isCoGM
-  const canDelete = isCreator || isOwner
+  const isMember = !!membership
 
-  if (!campaign && !membership) {
+  // User must be a campaign member to view jobs
+  if (!isMember) {
     notFound()
   }
 
+  const canEdit = isCreator || isOwner || isCoGM
+  const canDelete = isCreator || isOwner
+
   // Fetch related data
-  const [organizationResult, missionTypeResult, encountersResult, npcsResult] = await Promise.all([
+  const [
+    organizationResult,
+    missionTypeResult,
+    encountersResult,
+    npcsResult,
+    allOrganizationsResult,
+    allMissionTypesResult,
+  ] = await Promise.all([
     job.organization_id
       ? supabase.from('organizations').select('*').eq('id', job.organization_id).single()
       : Promise.resolve({ data: null }),
@@ -74,12 +88,16 @@ export default async function JobDetailPage({ params }: Props) {
       : Promise.resolve({ data: null }),
     supabase.from('encounters').select('*').eq('job_id', jobId).order('created_at'),
     supabase.from('npcs').select('*').eq('job_id', jobId).order('created_at'),
+    supabase.from('organizations').select('*').eq('campaign_id', campaignId).order('name'),
+    supabase.from('mission_types').select('*').eq('campaign_id', campaignId).order('name'),
   ])
 
   const organization = organizationResult.data as Organization | null
   const missionType = missionTypeResult.data as MissionType | null
   const encounters = (encountersResult.data || []) as Encounter[]
   const npcs = (npcsResult.data || []) as NPC[]
+  const allOrganizations = (allOrganizationsResult.data || []) as Organization[]
+  const allMissionTypes = (allMissionTypesResult.data || []) as MissionType[]
 
   const getStatusBadge = (status: Job['status']) => {
     const colors = {
@@ -124,17 +142,26 @@ export default async function JobDetailPage({ params }: Props) {
             <div className="flex items-center gap-3">
               {getStatusBadge(job.status)}
               {canEdit && (
-                <Link
-                  href={`/gm/campaigns/${campaignId}/jobs/${jobId}/edit`}
-                  className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200"
-                >
-                  <Edit className="h-4 w-4" />
-                  Edit
-                </Link>
+                <>
+                  <RegenerateJobButton
+                    campaignId={campaignId}
+                    jobId={jobId}
+                    currentDifficulty={job.difficulty}
+                    currentOrganizationId={job.organization_id}
+                    currentMissionTypeId={job.mission_type_id}
+                    organizations={allOrganizations}
+                    missionTypes={allMissionTypes}
+                  />
+                  <Link
+                    href={`/gm/campaigns/${campaignId}/jobs/${jobId}/edit`}
+                    className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200"
+                  >
+                    <Edit className="h-4 w-4" />
+                    Edit
+                  </Link>
+                </>
               )}
-                {canDelete && (
-                  <DeleteJobButton campaignId={campaignId} jobId={jobId} />
-                )}
+              {canDelete && <DeleteJobButton campaignId={campaignId} jobId={jobId} />}
             </div>
           </div>
 

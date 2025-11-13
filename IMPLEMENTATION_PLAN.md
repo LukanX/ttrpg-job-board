@@ -101,7 +101,7 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - ✅ Edit job (title, description, status)
 - ✅ Delete job (cascade to encounters/NPCs)
 - ✅ Change job status (active → completed → archived)
-- [ ] Regenerate job with LLM
+- ✅ Regenerate job with LLM (full regeneration with confirmation)
 - ✅ Manual job creation (without LLM)
 - [ ] Bulk job operations
 
@@ -174,6 +174,10 @@ A web application that generates TTRPG job postings using AI, allowing GMs to ma
 - [ ] Multiple job generation (batch)
 - [ ] AI plot twist generator
 - [ ] Session recap generator
+- [ ] Advanced job regeneration options:
+  - [ ] Partial regeneration (encounters only, NPCs only)
+  - [ ] "Remix" mode (regenerate with existing content as context)
+  - [ ] Keep specific elements while regenerating others
 
 ### 3.2 Campaign Progression
 - [ ] Mark jobs as completed
