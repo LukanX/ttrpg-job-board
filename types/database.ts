@@ -96,6 +96,19 @@ export interface CampaignMember {
   user_id: string
   role: CampaignMemberRole
   character_name?: string | null
+  character_id?: string | null
+  created_at: string
+  updated_at: string
+}
+
+export interface Character {
+  id: string
+  user_id: string
+  name: string
+  class: string
+  ancestry: string
+  level: number
+  stats: Record<string, unknown>
   created_at: string
   updated_at: string
 }

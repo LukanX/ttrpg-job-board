@@ -65,11 +65,7 @@ export default function SignupPage() {
       if (data.session) {
         // Auto-confirmed, redirect immediately with full page reload
         // This ensures middleware runs and session cookies are properly set
-        if (role === 'gm') {
-          window.location.href = '/gm/dashboard'
-        } else {
-          window.location.href = '/'
-        }
+        window.location.href = '/dashboard'
       } else {
         // Email confirmation required - show success message
         setSuccess('Account created! Please check your email to confirm your account.')

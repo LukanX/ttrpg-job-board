@@ -4,6 +4,7 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
+      target: dev
       args:
         # Pass NEXT_PUBLIC_ vars for build-time inlining
         NEXT_PUBLIC_SUPABASE_URL: ${NEXT_PUBLIC_SUPABASE_URL}
@@ -17,6 +18,9 @@ services:
       - NODE_ENV=development
       # Override for server-side Supabase connection from inside Docker
       - SUPABASE_URL_INTERNAL=http://host.docker.internal:54321
+      # Enable polling for hot reloading on Windows/WSL
+      - WATCHPACK_POLLING=true
+      - CHOKIDAR_USEPOLLING=true
     volumes:
       - ./:/app:delegated
       - /app/node_modules

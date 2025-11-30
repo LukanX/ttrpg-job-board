@@ -41,9 +41,9 @@ export default function JoinCampaignButton({ token }: JoinCampaignButtonProps) {
         // Redirect to campaign after successful join
         setTimeout(() => {
           if (body.member?.campaign_id) {
-            router.push(`/gm/campaigns/${body.member.campaign_id}`)
+            router.push(`/campaigns/${body.member.campaign_id}`)
           } else {
-            router.push('/gm/dashboard')
+            router.push('/dashboard')
           }
         }, 1500)
       }
