@@ -26,10 +26,13 @@ export default async function Dashboard() {
     console.error('Error fetching campaigns:', membersError)
   }
 
-  const campaigns = members?.map(m => ({
-    ...(m.campaign as Campaign),
-    userRole: m.role as CampaignMemberRole
-  })) || []
+  const campaigns = members?.map(m => {
+    const campaign = Array.isArray(m.campaign) ? m.campaign[0] : m.campaign
+    return {
+      ...(campaign as Campaign),
+      userRole: m.role as CampaignMemberRole
+    }
+  }).filter(c => c.id) || []
 
   const gmCampaigns = campaigns.filter(c => c.userRole === 'owner' || c.userRole === 'co-gm')
   const playerCampaigns = campaigns.filter(c => c.userRole === 'viewer')
