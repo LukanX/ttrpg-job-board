@@ -177,16 +177,23 @@ export default async function CampaignPage({ params }: PageProps) {
     }))
   }
 
+  // Fetch user's characters for assignment
+  const { data: userCharacters } = await supabase
+    .from('characters')
+    .select('id, name, class, level, ancestry')
+    .eq('user_id', user.id)
+    .order('name')
+
   return (
     <div className="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
       <div className="px-4 py-6 sm:px-0">
         {/* Header */}
         <div className="mb-6">
           <Link
-            href="/gm/dashboard"
+            href="/dashboard"
             className="text-sm text-gray-600 hover:text-gray-900 mb-2 inline-block"
           >
-            ← Back to Campaigns
+            ← Back to Dashboard
           </Link>
           <div className="flex justify-between items-start">
               <div>
@@ -198,7 +205,7 @@ export default async function CampaignPage({ params }: PageProps) {
               </p>
               <div className="mt-3">
                 <Link
-                  href={`/gm/campaigns/${id}/edit`}
+                  href={`/campaigns/${id}/edit`}
                   aria-label={`Edit ${campaign.name}`}
                   className="inline-flex items-center rounded-md px-3 py-2 text-sm font-medium text-blue-600 hover:bg-gray-100"
                 >
@@ -238,6 +245,7 @@ export default async function CampaignPage({ params }: PageProps) {
           initialInviteLinks={inviteLinksList}
           initialJoinRequests={joinRequestsList}
           currentUserId={user.id}
+          userCharacters={userCharacters || []}
         />
       </div>
     </div>

@@ -37,7 +37,8 @@ export default function DeleteJobButton({ campaignId, jobId }: Props) {
 
       // Close modal and redirect back to campaign page
       setIsOpen(false)
-      router.push(`/gm/campaigns/${campaignId}`)
+      router.refresh()
+      router.push(`/campaigns/${campaignId}`)
     } catch (err) {
       console.error(err)
       setError('Failed to delete job')

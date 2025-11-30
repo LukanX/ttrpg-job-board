@@ -93,7 +93,7 @@ export default async function EditJobPage({ params }: Props) {
       <div className="max-w-4xl mx-auto">
         <div className="mb-6">
           <Link
-            href={`/gm/campaigns/${campaignId}/jobs/${jobId}`}
+            href={`/campaigns/${campaignId}/jobs/${jobId}`}
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             ← Back to Job

@@ -60,11 +60,10 @@ export default function GenerateJobPage() {
     setGenerating(true)
 
     try {
-      const response = await fetch('/api/jobs/generate', {
+      const response = await fetch(`/api/campaigns/${campaignId}/jobs/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          campaignId,
           organizationId: organizationId || null,
           missionTypeId: missionTypeId || null,
           difficulty,
@@ -78,7 +77,7 @@ export default function GenerateJobPage() {
       }
 
       const { jobId } = await response.json()
-      router.push(`/gm/campaigns/${campaignId}/jobs/${jobId}`)
+      router.push(`/campaigns/${campaignId}/jobs/${jobId}`)
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to generate job')
       setGenerating(false)

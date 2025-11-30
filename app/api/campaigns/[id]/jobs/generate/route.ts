@@ -3,7 +3,6 @@ import { createClient } from '@/lib/supabase/server'
 import { generateJob } from '@/lib/llm/provider'
 
 interface GenerateJobRequest {
-  campaignId: string
   organizationId?: string | null
   missionTypeId?: string | null
   difficulty: number
@@ -30,8 +29,12 @@ interface JobData {
   gm_notes?: string
 }
 
-export async function POST(request: NextRequest) {
+export async function POST(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
   try {
+    const { id: campaignId } = await params
     const supabase = await createClient()
 
     // Check authentication
@@ -46,7 +49,7 @@ export async function POST(request: NextRequest) {
 
     // Parse request body
     const body: GenerateJobRequest = await request.json()
-    const { campaignId, organizationId, missionTypeId, difficulty, additionalContext } = body
+    const { organizationId, missionTypeId, difficulty, additionalContext } = body
 
     // Validate required fields
     if (!campaignId || difficulty < 1 || difficulty > 10) {
@@ -110,7 +113,7 @@ export async function POST(request: NextRequest) {
     })
 
     // Generate job using LLM (try OpenAI first, fallback to Gemini)
-  let llmResponse: unknown
+    let llmResponse: unknown
     let provider: 'openai' | 'gemini' = 'openai'
 
     try {
@@ -231,8 +234,8 @@ export async function POST(request: NextRequest) {
 function buildJobPrompt(params: {
   partyLevel: number
   difficulty: number
-  organization?: Record<string, unknown>
-  missionType?: Record<string, unknown>
+  organization?: Record<string, unknown> | null
+  missionType?: Record<string, unknown> | null
   additionalContext?: string | null
 }): string {
   const { partyLevel, difficulty, organization, missionType, additionalContext } = params

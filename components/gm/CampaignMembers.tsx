@@ -67,6 +67,13 @@ interface Props {
 	initialInviteLinks?: InviteLink[]
 	initialJoinRequests?: JoinRequest[]
 	currentUserId?: string // Add current user ID to know which member is the current user
+	userCharacters?: Array<{
+		id: string
+		name: string
+		class: string
+		level: number
+		ancestry: string
+	}>
 }
 
 export default function CampaignMembers({
@@ -78,6 +85,7 @@ export default function CampaignMembers({
 	initialInviteLinks,
 	initialJoinRequests,
 	currentUserId,
+	userCharacters,
 }: Props) {
 	const router = useRouter()
 	const [members, setMembers] = useState<Member[] | null>(initialMembers ?? null)
@@ -296,6 +304,8 @@ export default function CampaignMembers({
 	// Character assignment
 	const startEditingCharacter = (memberId: string, currentCharacter?: string | null) => {
 		setEditingCharacter(memberId)
+		// If currentCharacter matches a character name in the list, we could pre-select it
+		// But for now, we'll just let them pick from the list
 		setCharacterName(currentCharacter || '')
 	}
 
@@ -304,27 +314,34 @@ export default function CampaignMembers({
 		setCharacterName('')
 	}
 
-	const saveCharacterName = async () => {
+	const saveCharacterName = async (characterId?: string, name?: string) => {
 		setSavingCharacter(true)
 		setError(null)
 		try {
+			const payload = characterId 
+				? { characterId } 
+				: { characterName: name?.trim() || null }
+
 			const res = await fetch(`/api/campaigns/${campaignId}/members/me/character`, {
 				method: 'PATCH',
 				headers: { 'Content-Type': 'application/json' },
-				body: JSON.stringify({ characterName: characterName.trim() || null }),
+				body: JSON.stringify(payload),
 			})
 
 			const body = await res.json().catch(() => ({}))
 
 			if (!res.ok) {
-				throw new Error(body.error || 'Failed to update character name')
+				throw new Error(body.error || 'Failed to update character')
 			}
 
 			// Update local state
 			setMembers((prev) => 
 				prev ? prev.map((m) => 
 					m.user_id === currentUserId 
-						? { ...m, character_name: characterName.trim() || null }
+						? { 
+								...m, 
+								character_name: name || (characterId ? userCharacters?.find(c => c.id === characterId)?.name : null) 
+							}
 						: m
 				) : prev
 			)
@@ -377,25 +394,51 @@ export default function CampaignMembers({
 											<div className="mt-2">
 												{isEditingThisCharacter ? (
 													<div className="flex items-center gap-2">
-														<input
-															type="text"
-															value={characterName}
-															onChange={(e) => setCharacterName(e.target.value)}
-															placeholder="Character name"
-															className="text-sm px-2 py-1 border rounded flex-1 max-w-xs"
-															autoFocus
-															onKeyDown={(e) => {
-																if (e.key === 'Enter') saveCharacterName()
-																if (e.key === 'Escape') cancelEditingCharacter()
-															}}
-														/>
-														<button
-															onClick={saveCharacterName}
-															disabled={savingCharacter}
-															className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
-														>
-															{savingCharacter ? 'Saving...' : 'Save'}
-														</button>
+														{userCharacters && userCharacters.length > 0 ? (
+															<select
+																className="text-sm px-2 py-1 border rounded flex-1 max-w-xs"
+																onChange={(e) => {
+																	const val = e.target.value;
+																	if (val === '__manual__') {
+																		// Handle manual entry if needed, or just ignore
+																	} else {
+																		saveCharacterName(val, undefined)
+																	}
+																}}
+																defaultValue=""
+															>
+																<option value="" disabled>Select a character...</option>
+																{userCharacters.map(c => (
+																	<option key={c.id} value={c.id}>
+																		{c.name} (Lvl {c.level} {c.class})
+																	</option>
+																))}
+															</select>
+														) : (
+															<input
+																type="text"
+																value={characterName}
+																onChange={(e) => setCharacterName(e.target.value)}
+																placeholder="Character name"
+																className="text-sm px-2 py-1 border rounded flex-1 max-w-xs"
+																autoFocus
+																onKeyDown={(e) => {
+																	if (e.key === 'Enter') saveCharacterName(undefined, characterName)
+																	if (e.key === 'Escape') cancelEditingCharacter()
+																}}
+															/>
+														)}
+														
+														{!userCharacters || userCharacters.length === 0 ? (
+															<button
+																onClick={() => saveCharacterName(undefined, characterName)}
+																disabled={savingCharacter}
+																className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700 disabled:opacity-50"
+															>
+																{savingCharacter ? 'Saving...' : 'Save'}
+															</button>
+														) : null}
+														
 														<button
 															onClick={cancelEditingCharacter}
 															disabled={savingCharacter}

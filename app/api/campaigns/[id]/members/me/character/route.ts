@@ -4,7 +4,8 @@ import { createClient } from '@/lib/supabase/server'
 
 // Schema for updating character assignment
 const UpdateCharacterSchema = z.object({
-  characterName: z.string().max(100).nullable(),
+  characterName: z.string().max(100).nullable().optional(),
+  characterId: z.string().uuid().nullable().optional(),
 })
 
 // No service-role client here: rely on DB RLS + trigger to allow a member
@@ -13,7 +14,7 @@ const UpdateCharacterSchema = z.object({
 
 /**
  * PATCH /api/campaigns/[id]/members/me/character
- * Update the current user's character name for this campaign
+ * Update the current user's character name or ID for this campaign
  */
 export async function PATCH(
   request: NextRequest,
@@ -40,14 +41,31 @@ export async function PATCH(
       return NextResponse.json({ error: parse.error.flatten() }, { status: 400 })
     }
 
-    const { characterName } = parse.data
+    const { characterName, characterId } = parse.data
+
+    // If characterId is provided, fetch the name from the characters table
+    let finalCharacterName = characterName;
+    if (characterId) {
+      const { data: charData } = await supabase
+        .from('characters')
+        .select('name')
+        .eq('id', characterId)
+        .single()
+      
+      if (charData) {
+        finalCharacterName = charData.name
+      }
+    }
 
     // Update using the session-bound server client. With the RLS policy and
     // trigger in place, the DB will allow the update only when
     // user_id = auth.uid() and will prevent changes to sensitive columns.
     const { data: updated, error: updateError } = await supabase
       .from('campaign_members')
-      .update({ character_name: characterName || null })
+      .update({ 
+        character_name: finalCharacterName || null,
+        character_id: characterId || null
+      })
       .eq('campaign_id', campaignId)
       .eq('user_id', user.id)
       .select('id, character_name')

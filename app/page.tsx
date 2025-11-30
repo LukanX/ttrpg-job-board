@@ -26,6 +26,9 @@ export default async function Home() {
             <div className="flex items-center space-x-4">
               {user ? (
                 <>
+                  <Link href="/dashboard" className="text-sm text-gray-700 hover:text-gray-900 font-medium">
+                    Dashboard
+                  </Link>
                   <span className="text-sm text-gray-700">{user.email}</span>
                   <form action={handleSignOut}>
                     <button type="submit" className="text-sm text-gray-700 hover:text-gray-900 font-medium">
@@ -63,7 +66,7 @@ export default async function Home() {
           <div className="mt-10 flex justify-center gap-4">
             {user ? (
               <Link
-                href="/gm/dashboard"
+                href="/dashboard"
                 className="inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
               >
                 Go to Dashboard

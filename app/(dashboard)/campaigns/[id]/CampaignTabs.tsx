@@ -51,6 +51,13 @@ interface Props {
       display_name?: string | null
     } | null
   }>
+  userCharacters?: Array<{
+    id: string
+    name: string
+    class: string
+    level: number
+    ancestry: string
+  }>
 }
 
 type TabType = 'jobs' | 'organizations' | 'mission-types' | 'members'
@@ -68,7 +75,13 @@ export default function CampaignTabs({
   canManage,
   membersCount,
   currentUserId,
-}: Props & { userRole?: 'owner' | 'co-gm' | 'viewer' | null; canManage?: boolean; membersCount?: number; currentUserId?: string }) {
+  userCharacters,
+}: Props & { 
+  userRole?: 'owner' | 'co-gm' | 'viewer' | null; 
+  canManage?: boolean; 
+  membersCount?: number; 
+  currentUserId?: string;
+}) {
   const [activeTab, setActiveTab] = useState<TabType>('jobs')
 
   const tabs = [
@@ -132,6 +145,7 @@ export default function CampaignTabs({
               initialInviteLinks={initialInviteLinks}
               initialJoinRequests={initialJoinRequests}
               currentUserId={currentUserId}
+              userCharacters={userCharacters}
             />
           </>
         )}

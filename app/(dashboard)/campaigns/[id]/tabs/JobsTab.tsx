@@ -38,13 +38,13 @@ export default function JobsTab({ campaignId, jobs, organizations, missionTypes 
         <h2 className="text-xl font-semibold text-gray-900">Mission Jobs</h2>
         <div className="flex items-center gap-3">
           <button
-            onClick={() => router.push(`/gm/campaigns/${campaignId}/jobs/new`)}
+            onClick={() => router.push(`/campaigns/${campaignId}/jobs/new`)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
           >
             + Create Job
           </button>
           <button
-            onClick={() => router.push(`/gm/campaigns/${campaignId}/jobs/generate`)}
+            onClick={() => router.push(`/campaigns/${campaignId}/jobs/generate`)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
             ✨ Generate Job
@@ -82,14 +82,14 @@ export default function JobsTab({ campaignId, jobs, organizations, missionTypes 
                   </div>
                   <div className="flex items-center gap-2">
                     <Link
-                      href={`/gm/campaigns/${campaignId}/jobs/${job.id}/edit`}
+                      href={`/campaigns/${campaignId}/jobs/${job.id}/edit`}
                       className="inline-flex items-center gap-1 px-3 py-1 text-blue-600 hover:bg-blue-50 rounded-md"
                     >
                       <Edit className="h-3 w-3" />
                       <span className="text-xs font-medium">Edit</span>
                     </Link>
                     <button
-                      onClick={() => router.push(`/gm/campaigns/${campaignId}/jobs/${job.id}`)}
+                      onClick={() => router.push(`/campaigns/${campaignId}/jobs/${job.id}`)}
                       className="text-blue-600 hover:text-blue-800 font-medium"
                     >
                       View Details →
@@ -105,7 +105,7 @@ export default function JobsTab({ campaignId, jobs, organizations, missionTypes 
           <h3 className="text-lg font-medium text-gray-900 mb-2">No jobs yet</h3>
           <p className="text-gray-600 mb-6">Generate your first mission job with AI</p>
           <button
-            onClick={() => router.push(`/gm/campaigns/${campaignId}/jobs/generate`)}
+            onClick={() => router.push(`/campaigns/${campaignId}/jobs/generate`)}
             className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-blue-600 hover:bg-blue-700"
           >
             ✨ Generate Job

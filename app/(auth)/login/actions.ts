@@ -34,10 +34,6 @@ export async function login(formData: FormData) {
     return { error: 'Failed to load user profile' }
   }
 
-  // Redirect based on role
-  if (userData.role === 'gm') {
-    redirect('/gm/dashboard')
-  } else {
-    redirect('/')
-  }
+  // Redirect to dashboard for all users
+  redirect('/dashboard')
 }

@@ -65,7 +65,7 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
         }
 
         // Navigate back to job detail page
-        router.push(`/gm/campaigns/${campaignId}/jobs/${job.id}`)
+        router.push(`/campaigns/${campaignId}/jobs/${job.id}`)
         router.refresh()
       } else {
         // Create new job (not implemented yet - would be manual creation)
@@ -124,7 +124,7 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
         if (insertError) throw insertError
 
         // Navigate to the new job's detail page
-        router.push(`/gm/campaigns/${campaignId}/jobs/${data.id}`)
+        router.push(`/campaigns/${campaignId}/jobs/${data.id}`)
         router.refresh()
       }
     } catch (err) {

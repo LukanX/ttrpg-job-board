@@ -69,7 +69,7 @@ export default function CampaignForm({
 
         const json = await res.json()
         if (onSuccess) onSuccess(json.campaign)
-        router.push(`/gm/campaigns/${campaign.id}`)
+        router.push(`/campaigns/${campaign.id}`)
         router.refresh()
       } else {
         // Create flow: client-side supabase insert
@@ -95,7 +95,7 @@ export default function CampaignForm({
   if (error) throw error
 
   if (onSuccess) onSuccess(data)
-        router.push(`/gm/campaigns/${data.id}`)
+        router.push(`/campaigns/${data.id}`)
         router.refresh()
       }
     } catch (err) {

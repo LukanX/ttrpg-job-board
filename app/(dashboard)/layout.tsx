@@ -2,7 +2,7 @@ import { createClient } from '@/lib/supabase/server'
 import { redirect } from 'next/navigation'
 import Link from 'next/link'
 
-export default async function GMLayout({
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
@@ -31,16 +31,22 @@ export default async function GMLayout({
           <div className="flex justify-between h-16">
             <div className="flex">
               <div className="flex-shrink-0 flex items-center">
-                <Link href="/gm/dashboard" className="text-xl font-bold text-gray-900">
+                <Link href="/dashboard" className="text-xl font-bold text-gray-900">
                   Starfinder Job Board
                 </Link>
               </div>
               <div className="hidden sm:ml-6 sm:flex sm:space-x-8">
                 <Link
-                  href="/gm/dashboard"
-                  className="border-blue-500 text-gray-900 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                  href="/dashboard"
+                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
                 >
                   Dashboard
+                </Link>
+                <Link
+                  href="/characters"
+                  className="border-transparent text-gray-500 hover:border-gray-300 hover:text-gray-700 inline-flex items-center px-1 pt-1 border-b-2 text-sm font-medium"
+                >
+                  Characters
                 </Link>
               </div>
             </div>

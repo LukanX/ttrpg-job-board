@@ -26,7 +26,7 @@ export default async function NewJobPage({ params }: Props) {
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="mb-6">
-          <a href={`/gm/campaigns/${campaignId}`} className="text-blue-600 hover:text-blue-800 font-medium">← Back to Campaign</a>
+          <a href={`/campaigns/${campaignId}`} className="text-blue-600 hover:text-blue-800 font-medium">← Back to Campaign</a>
         </div>
 
         <div className="bg-white shadow rounded-lg p-8">

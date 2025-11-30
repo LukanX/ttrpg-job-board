@@ -122,7 +122,7 @@ export default async function JobDetailPage({ params }: Props) {
         {/* Header */}
         <div className="mb-6">
           <a
-            href={`/gm/campaigns/${campaignId}`}
+            href={`/campaigns/${campaignId}`}
             className="text-blue-600 hover:text-blue-800 font-medium"
           >
             ← Back to Campaign
@@ -153,7 +153,7 @@ export default async function JobDetailPage({ params }: Props) {
                     missionTypes={allMissionTypes}
                   />
                   <Link
-                    href={`/gm/campaigns/${campaignId}/jobs/${jobId}/edit`}
+                    href={`/campaigns/${campaignId}/jobs/${jobId}/edit`}
                     className="inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:bg-blue-50 rounded-md border border-blue-200"
                   >
                     <Edit className="h-4 w-4" />

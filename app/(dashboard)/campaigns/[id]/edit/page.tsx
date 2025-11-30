@@ -37,7 +37,7 @@ export default async function EditCampaignPage({ params }: Params) {
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Campaign not found</h1>
           <p className="text-gray-600 mb-4">We couldn&apos;t find that campaign. It may have been deleted or the link is incorrect.</p>
-          <Link href="/gm/campaigns" className="text-blue-600 hover:text-blue-800">Back to campaigns</Link>
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">Back to dashboard</Link>
         </div>
       </div>
     )
@@ -50,7 +50,7 @@ export default async function EditCampaignPage({ params }: Params) {
         <div className="px-4 py-6 sm:px-0">
           <h1 className="text-2xl font-bold text-gray-900 mb-4">Access denied</h1>
           <p className="text-gray-600 mb-4">You don&apos;t have permission to edit this campaign.</p>
-          <Link href="/gm/campaigns" className="text-blue-600 hover:text-blue-800">Back to campaigns</Link>
+          <Link href="/dashboard" className="text-blue-600 hover:text-blue-800">Back to dashboard</Link>
         </div>
       </div>
     )

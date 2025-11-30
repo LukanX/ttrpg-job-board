@@ -170,7 +170,7 @@ export default async function InviteCampaignPage({ params }: { params: Promise<{
               ✓ You are already a member of this campaign.
             </p>
             <Link
-              href={`/gm/campaigns/${inviteLink.campaign_id}`}
+              href={`/campaigns/${inviteLink.campaign_id}`}
               className="mt-3 inline-block px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
             >
               Go to Campaign
