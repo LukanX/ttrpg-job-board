@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Edit } from 'lucide-react'
 import type { Job, Organization, MissionType } from '@/types/database'
+import { getDifficultyLevel, getDifficultyColor } from '@/lib/difficulty'
 
 interface Props {
   campaignId: string
@@ -26,10 +27,6 @@ export default function JobsTab({ campaignId, jobs, organizations, missionTypes 
         {status.charAt(0).toUpperCase() + status.slice(1)}
       </span>
     )
-  }
-
-  const getDifficultyStars = (difficulty: number) => {
-    return '★'.repeat(difficulty) + '☆'.repeat(10 - difficulty)
   }
 
   return (
@@ -75,8 +72,8 @@ export default function JobsTab({ campaignId, jobs, organizations, missionTypes 
 
                 <div className="flex justify-between items-center text-sm">
                   <div className="flex items-center gap-4">
-                    <span className="text-yellow-500" title={`Difficulty: ${job.difficulty}/10`}>
-                      {getDifficultyStars(job.difficulty)}
+                    <span className={`px-2 py-1 rounded-md border font-semibold text-xs ${getDifficultyColor(getDifficultyLevel(job.difficulty))}`}>
+                      {getDifficultyLevel(job.difficulty)}
                     </span>
                     {job.reward && <span className="text-gray-600">💰 {job.reward}</span>}
                   </div>
