@@ -1,17 +1,22 @@
 export function buildJobPrompt(params: {
   partyLevel: number
   difficulty: number
+  location?: string | null
   organization?: Record<string, unknown> | null
   missionType?: Record<string, unknown> | null
   additionalContext?: string | null
 }): string {
-  const { partyLevel, difficulty, organization, missionType, additionalContext } = params
+  const { partyLevel, difficulty, location, organization, missionType, additionalContext } = params
 
   let prompt = `Generate a Starfinder 2nd Edition mission job for a party of level ${partyLevel} adventurers.
 
 DIFFICULTY: ${difficulty}/10 (1=trivial, 5=moderate, 10=deadly)
 
 `
+
+  if (location) {
+    prompt += `LOCATION: ${location}\n\n`
+  }
 
   if (organization && typeof organization === 'object') {
     const org = organization as Record<string, unknown>
@@ -49,6 +54,7 @@ DIFFICULTY: ${difficulty}/10 (1=trivial, 5=moderate, 10=deadly)
 {
   "title": "Engaging mission title",
   "description": "Detailed mission description (2-3 paragraphs) that includes the situation, objectives, and stakes. Make it exciting and specific to Starfinder 2E themes (space exploration, alien cultures, technology, etc.)",
+  "location": "Specific location (e.g., 'Absalom Station', 'Akiton', 'The Drift', 'Unknown Sector')",
   "difficulty": ${difficulty},
   "reward": "Appropriate monetary reward in credits and/or other rewards",
   "encounters": [

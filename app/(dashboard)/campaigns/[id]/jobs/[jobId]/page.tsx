@@ -135,7 +135,8 @@ export default async function JobDetailPage({ params }: Props) {
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
               <div className="flex items-center gap-4 text-sm text-gray-600">
-                {organization && <span>📍 {organization.name}</span>}
+                {organization && <span>🏢 {organization.name}</span>}
+                {job.location && <span>📍 {job.location}</span>}
                 {missionType && <span>🎯 {missionType.name}</span>}
               </div>
             </div>

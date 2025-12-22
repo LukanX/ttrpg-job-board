@@ -6,6 +6,7 @@ import { buildJobPrompt } from '@/lib/llm/prompts'
 interface GenerateJobRequest {
   organizationId?: string | null
   missionTypeId?: string | null
+  location?: string | null
   difficulty: number
   additionalContext?: string | null
 }
@@ -13,6 +14,7 @@ interface GenerateJobRequest {
 interface JobData {
   title: string
   description: string
+  location?: string
   difficulty: number
   reward?: string
   encounters: Array<{
@@ -50,7 +52,7 @@ export async function POST(
 
     // Parse request body
     const body: GenerateJobRequest = await request.json()
-    const { organizationId, missionTypeId, difficulty, additionalContext } = body
+    const { organizationId, missionTypeId, location, difficulty, additionalContext } = body
 
     // Validate required fields
     if (!campaignId || difficulty < 1 || difficulty > 10) {
@@ -108,6 +110,7 @@ export async function POST(
     const prompt = buildJobPrompt({
       partyLevel: campaign.party_level,
       difficulty,
+      location,
       organization,
       missionType,
       additionalContext,
@@ -165,6 +168,7 @@ export async function POST(
         mission_type_id: missionTypeId || null,
         title: jobData.title,
         description: jobData.description,
+        location: jobData.location || null,
         difficulty: jobData.difficulty || difficulty,
         reward: jobData.reward || null,
         status: 'active',

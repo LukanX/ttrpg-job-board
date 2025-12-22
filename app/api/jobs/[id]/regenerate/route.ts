@@ -13,6 +13,7 @@ interface RegenerateJobRequest {
 interface JobData {
   title: string
   description: string
+  location?: string
   difficulty: number
   reward?: string
   encounters: Array<{
@@ -191,6 +192,7 @@ export async function POST(
         mission_type_id: missionTypeId || null,
         title: jobData.title,
         description: jobData.description,
+        location: jobData.location || null,
         difficulty: jobData.difficulty || difficulty,
         reward: jobData.reward || null,
         gm_notes: jobData.gm_notes || null,

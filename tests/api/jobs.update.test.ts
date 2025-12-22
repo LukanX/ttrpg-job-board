@@ -238,6 +238,95 @@ describe('PATCH /api/jobs/[id]', () => {
     expect(body.title).toBe('Updated Job')
   })
 
+  it('should allow updating location', async () => {
+    const userId = 'user-id'
+
+    mockSupabase.auth.getUser.mockResolvedValue({
+      data: { user: { id: userId } },
+    })
+
+    const updateSpy = jest.fn().mockReturnThis()
+    let callCount = 0
+
+    mockSupabase.from.mockImplementation((table: string) => {
+      callCount++
+
+      if (table === 'jobs' && callCount === 1) {
+        // Fetch job
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: {
+              id: 'job-id',
+              campaign_id: 'campaign-id',
+              created_by: userId,
+            },
+            error: null,
+          }),
+        }
+      }
+
+      if (table === 'campaigns') {
+        // Fetch campaign
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: { gm_id: 'other-user-id' },
+            error: null,
+          }),
+        }
+      }
+
+      if (table === 'campaign_members') {
+        // Membership check
+        return {
+          select: jest.fn().mockReturnThis(),
+          eq: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: null,
+            error: { message: 'Not found' },
+          }),
+        }
+      }
+
+      if (table === 'jobs' && callCount === 4) {
+        // Update
+        return {
+          update: updateSpy,
+          eq: jest.fn().mockReturnThis(),
+          select: jest.fn().mockReturnThis(),
+          single: jest.fn().mockResolvedValue({
+            data: {
+              id: 'job-id',
+              location: 'Absalom Station',
+              updated_at: expect.any(String),
+            },
+            error: null,
+          }),
+        }
+      }
+
+      return undefined
+    })
+
+    const request = {
+      json: async () => ({ location: 'Absalom Station' }),
+    } as NextRequest
+
+    const response = await PATCH(request, {
+      params: Promise.resolve({ id: 'job-id' }),
+    })
+
+    expect(response.status).toBe(200)
+    expect(updateSpy).toHaveBeenCalledWith(
+      expect.objectContaining({ location: 'Absalom Station' })
+    )
+    const body = await response.json()
+    expect(body.location).toBe('Absalom Station')
+  })
+
   it('should successfully update job if user is campaign owner', async () => {
     const userId = 'user-id'
 

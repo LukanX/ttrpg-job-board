@@ -61,7 +61,8 @@ export default function JobsTab({ campaignId, jobs, organizations, missionTypes 
                   <div className="flex-1">
                     <h3 className="text-lg font-semibold text-gray-900">{job.title}</h3>
                     <div className="flex items-center gap-3 mt-1 text-sm text-gray-600">
-                      {org && <span>📍 {org.name}</span>}
+                      {org && <span>🏢 {org.name}</span>}
+                      {job.location && <span>📍 {job.location}</span>}
                       {missionType && <span>🎯 {missionType.name}</span>}
                     </div>
                   </div>

@@ -21,6 +21,7 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
   const [formData, setFormData] = useState({
     title: job?.title || '',
     description: job?.description || '',
+    location: job?.location || '',
     difficulty: job ? getDifficultyLevel(job.difficulty) : 'Medium' as DifficultyLevel,
     reward: job?.reward || '',
     status: job?.status || 'active' as Job['status'],
@@ -51,6 +52,7 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           body: JSON.stringify({
             title: formData.title,
             description: formData.description,
+            location: formData.location || null,
             difficulty: difficultyLevelToNumber(formData.difficulty),
             reward: formData.reward || null,
             status: formData.status,
@@ -111,7 +113,8 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
             campaign_id: campaignId,
             title: formData.title,
             description: formData.description,
-            difficulty: formData.difficulty,
+            location: formData.location || null,
+            difficulty: difficultyLevelToNumber(formData.difficulty),
             reward: formData.reward || null,
             status: formData.status,
             gm_notes: formData.gm_notes || null,
@@ -160,7 +163,6 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           placeholder="e.g., Rescue Mission on Absalom Station"
         />
       </div>
-
       {/* Description */}
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
@@ -174,6 +176,22 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Describe the mission briefing..."
+        />
+      </div>
+
+      {/* Location */}
+      <div>
+        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+          Location
+        </label>
+        <input
+          type="text"
+          id="location"
+          maxLength={200}
+          value={formData.location}
+          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="e.g., Absalom Station, Akiton, The Drift"
         />
       </div>
 
