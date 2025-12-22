@@ -52,6 +52,7 @@ describe('JobForm', () => {
     mission_type_id: 'type-1',
     title: 'Test Job',
     description: 'Test description',
+    location: 'Test Location',
     difficulty: 5,
     reward: '1000 credits',
     status: 'active',
@@ -79,7 +80,7 @@ describe('JobForm', () => {
 
     expect(screen.getByLabelText(/job title/i)).toHaveValue('')
     expect(screen.getByLabelText(/description/i)).toHaveValue('')
-    expect(screen.getByLabelText(/difficulty/i)).toHaveValue(5)
+    expect(screen.getByLabelText(/difficulty/i)).toHaveValue('Medium')
     expect(screen.getByText('Create Job')).toBeInTheDocument()
   })
 
@@ -95,7 +96,8 @@ describe('JobForm', () => {
 
     expect(screen.getByLabelText(/job title/i)).toHaveValue('Test Job')
     expect(screen.getByLabelText(/description/i)).toHaveValue('Test description')
-    expect(screen.getByLabelText(/difficulty/i)).toHaveValue(5)
+    expect(screen.getByLabelText(/location/i)).toHaveValue('Test Location')
+    expect(screen.getByLabelText(/difficulty/i)).toHaveValue('Medium')
     expect(screen.getByLabelText(/reward/i)).toHaveValue('1000 credits')
     expect(screen.getByText('Update Job')).toBeInTheDocument()
   })
@@ -133,7 +135,7 @@ describe('JobForm', () => {
     })
 
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/gm/campaigns/campaign-1/jobs/job-1')
+      expect(mockRouter.push).toHaveBeenCalledWith('/campaigns/campaign-1/jobs/job-1')
       expect(mockRouter.refresh).toHaveBeenCalled()
     })
   })
@@ -200,7 +202,7 @@ describe('JobForm', () => {
     fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/gm/campaigns/campaign-1/jobs/new-job-id')
+      expect(mockRouter.push).toHaveBeenCalledWith('/campaigns/campaign-1/jobs/new-job-id')
       expect(mockRouter.refresh).toHaveBeenCalled()
     })
   })
@@ -286,7 +288,7 @@ describe('JobForm', () => {
     fireEvent.click(submitButton)
 
     await waitFor(() => {
-      expect(mockRouter.push).toHaveBeenCalledWith('/gm/campaigns/campaign-1/jobs/job-new')
+      expect(mockRouter.push).toHaveBeenCalledWith('/campaigns/campaign-1/jobs/job-new')
     })
   })
 })

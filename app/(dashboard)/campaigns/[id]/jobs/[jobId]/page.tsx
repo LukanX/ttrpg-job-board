@@ -5,6 +5,7 @@ import { Edit } from 'lucide-react'
 import DeleteJobButton from '@/components/gm/DeleteJobButton'
 import RegenerateJobButton from '@/components/gm/RegenerateJobButton'
 import type { Job, Organization, MissionType, Encounter, NPC } from '@/types/database'
+import { getDifficultyLevel, getDifficultyColor } from '@/lib/difficulty'
 
 interface Props {
   params: Promise<{
@@ -112,9 +113,8 @@ export default async function JobDetailPage({ params }: Props) {
     )
   }
 
-  const getDifficultyStars = (difficulty: number) => {
-    return '★'.repeat(difficulty) + '☆'.repeat(10 - difficulty)
-  }
+  const difficultyLevel = getDifficultyLevel(job.difficulty)
+  const difficultyColors = getDifficultyColor(difficultyLevel)
 
   return (
     <div className="min-h-screen bg-gray-50 py-8 px-4 sm:px-6 lg:px-8">
@@ -135,7 +135,8 @@ export default async function JobDetailPage({ params }: Props) {
             <div className="flex-1">
               <h1 className="text-3xl font-bold text-gray-900 mb-2">{job.title}</h1>
               <div className="flex items-center gap-4 text-sm text-gray-600">
-                {organization && <span>📍 {organization.name}</span>}
+                {organization && <span>🏢 {organization.name}</span>}
+                {job.location && <span>📍 {job.location}</span>}
                 {missionType && <span>🎯 {missionType.name}</span>}
               </div>
             </div>
@@ -168,8 +169,9 @@ export default async function JobDetailPage({ params }: Props) {
           <div className="flex items-center gap-6 mb-6">
             <div className="flex items-center gap-2">
               <span className="text-sm font-medium text-gray-700">Difficulty:</span>
-              <span className="text-xl text-yellow-500">{getDifficultyStars(job.difficulty)}</span>
-              <span className="text-sm text-gray-600">({job.difficulty}/10)</span>
+              <span className={`px-3 py-1 rounded-md border font-semibold ${difficultyColors}`}>
+                {difficultyLevel}
+              </span>
             </div>
             {job.reward && (
               <div className="flex items-center gap-2">

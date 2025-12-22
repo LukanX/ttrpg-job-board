@@ -45,7 +45,7 @@ describe('CampaignForm', () => {
   await waitFor(() => expect(mockFetch).toHaveBeenCalled())
 
     expect(mockFetch).toHaveBeenCalledWith('/api/campaigns/camp-1', expect.any(Object))
-    expect(mockPush).toHaveBeenCalledWith('/gm/campaigns/camp-1')
+    expect(mockPush).toHaveBeenCalledWith('/campaigns/camp-1')
     expect(mockRefresh).toHaveBeenCalled()
   })
 })

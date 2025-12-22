@@ -1,5 +1,5 @@
 import { render, screen, within } from '@testing-library/react'
-import CampaignTabs from '@/app/gm/campaigns/[id]/CampaignTabs'
+import CampaignTabs from '@/app/(dashboard)/campaigns/[id]/CampaignTabs'
 
 describe('CampaignTabs', () => {
   test('Members tab shows server-provided members count', () => {

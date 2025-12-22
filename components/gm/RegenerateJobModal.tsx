@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Organization, MissionType } from '@/types/database'
+import { DIFFICULTY_LEVELS, getDifficultyLevel, difficultyLevelToNumber, getDifficultyColor, type DifficultyLevel } from '@/lib/difficulty'
 
 interface RegenerateJobModalProps {
   campaignId: string
@@ -30,7 +31,7 @@ export default function RegenerateJobModal({
   const [error, setError] = useState<string | null>(null)
 
   const [formData, setFormData] = useState({
-    difficulty: currentDifficulty,
+    difficulty: getDifficultyLevel(currentDifficulty),
     organizationId: currentOrganizationId || '',
     missionTypeId: currentMissionTypeId || '',
     additionalContext: '',
@@ -46,7 +47,7 @@ export default function RegenerateJobModal({
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          difficulty: formData.difficulty,
+          difficulty: difficultyLevelToNumber(formData.difficulty),
           organizationId: formData.organizationId || null,
           missionTypeId: formData.missionTypeId || null,
           additionalContext: formData.additionalContext || null,
@@ -119,18 +120,25 @@ export default function RegenerateJobModal({
             {/* Difficulty */}
             <div>
               <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 mb-2">
-                Difficulty (1-10)
+                Difficulty Level
               </label>
-              <input
-                type="number"
+              <select
                 id="difficulty"
-                min={1}
-                max={10}
-                required
                 value={formData.difficulty}
-                onChange={(e) => setFormData({ ...formData, difficulty: parseInt(e.target.value) })}
+                onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as DifficultyLevel })}
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-              />
+              >
+                {DIFFICULTY_LEVELS.map((level) => (
+                  <option key={level} value={level}>
+                    {level}
+                  </option>
+                ))}
+              </select>
+              <div className="mt-2">
+                <span className={`inline-block px-3 py-1 rounded-md border font-semibold text-sm ${getDifficultyColor(formData.difficulty)}`}>
+                  {formData.difficulty}
+                </span>
+              </div>
             </div>
 
             {/* Organization */}

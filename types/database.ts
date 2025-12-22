@@ -46,6 +46,7 @@ export interface Job {
   mission_type_id: string | null
   title: string
   description: string
+  location: string | null
   difficulty: number
   reward: string | null
   status: 'active' | 'completed' | 'archived'

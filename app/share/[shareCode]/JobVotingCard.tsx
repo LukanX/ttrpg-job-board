@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import type { Job, Organization, MissionType } from '@/types/database'
+import { getDifficultyLevel, getDifficultyColor } from '@/lib/difficulty'
 
 interface Props {
   job: Job
@@ -106,9 +107,8 @@ export default function JobVotingCard({
     }
   }
 
-  const getDifficultyStars = (difficulty: number) => {
-    return '★'.repeat(difficulty) + '☆'.repeat(10 - difficulty)
-  }
+  const difficultyLevel = getDifficultyLevel(job.difficulty)
+  const difficultyColors = getDifficultyColor(difficultyLevel)
 
   const netVotes = upvotes - downvotes
   const totalVotes = upvotes + downvotes
@@ -125,11 +125,9 @@ export default function JobVotingCard({
               {missionType && <span>🎯 {missionType.name}</span>}
             </div>
           </div>
-          <div className="flex items-center gap-2 ml-4">
-            <span className="text-yellow-500" title={`Difficulty: ${job.difficulty}/10`}>
-              {getDifficultyStars(job.difficulty)}
-            </span>
-          </div>
+          <span className={`px-3 py-1 rounded-md border font-semibold text-sm ${difficultyColors}`}>
+            {difficultyLevel}
+          </span>
         </div>
 
         {/* Description */}

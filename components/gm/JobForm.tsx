@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import type { Job, Organization, MissionType } from '@/types/database'
+import { DIFFICULTY_LEVELS, getDifficultyLevel, difficultyLevelToNumber, getDifficultyColor, type DifficultyLevel } from '@/lib/difficulty'
 
 interface JobFormProps {
   campaignId: string
@@ -20,7 +21,8 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
   const [formData, setFormData] = useState({
     title: job?.title || '',
     description: job?.description || '',
-    difficulty: job?.difficulty || 5,
+    location: job?.location || '',
+    difficulty: job ? getDifficultyLevel(job.difficulty) : 'Medium' as DifficultyLevel,
     reward: job?.reward || '',
     status: job?.status || 'active' as Job['status'],
     gm_notes: job?.gm_notes || '',
@@ -50,7 +52,8 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           body: JSON.stringify({
             title: formData.title,
             description: formData.description,
-            difficulty: formData.difficulty,
+            location: formData.location || null,
+            difficulty: difficultyLevelToNumber(formData.difficulty),
             reward: formData.reward || null,
             status: formData.status,
             gm_notes: formData.gm_notes || null,
@@ -110,7 +113,8 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
             campaign_id: campaignId,
             title: formData.title,
             description: formData.description,
-            difficulty: formData.difficulty,
+            location: formData.location || null,
+            difficulty: difficultyLevelToNumber(formData.difficulty),
             reward: formData.reward || null,
             status: formData.status,
             gm_notes: formData.gm_notes || null,
@@ -159,7 +163,6 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           placeholder="e.g., Rescue Mission on Absalom Station"
         />
       </div>
-
       {/* Description */}
       <div>
         <label htmlFor="description" className="block text-sm font-medium text-gray-700 mb-2">
@@ -173,6 +176,22 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           placeholder="Describe the mission briefing..."
+        />
+      </div>
+
+      {/* Location */}
+      <div>
+        <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
+          Location
+        </label>
+        <input
+          type="text"
+          id="location"
+          maxLength={200}
+          value={formData.location}
+          onChange={(e) => setFormData({ ...formData, location: e.target.value })}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="e.g., Absalom Station, Akiton, The Drift"
         />
       </div>
 
@@ -269,21 +288,26 @@ export default function JobForm({ campaignId, job, organizations, missionTypes }
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div>
           <label htmlFor="difficulty" className="block text-sm font-medium text-gray-700 mb-2">
-            Difficulty (1-10) *
+            Difficulty Level *
           </label>
-          <input
-            type="number"
+          <select
             id="difficulty"
             required
-            min={1}
-            max={10}
             value={formData.difficulty}
-            onChange={(e) => setFormData({ ...formData, difficulty: parseInt(e.target.value) })}
+            onChange={(e) => setFormData({ ...formData, difficulty: e.target.value as DifficultyLevel })}
             className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
-          <p className="mt-1 text-sm text-gray-500">
-            {'★'.repeat(formData.difficulty)}{'☆'.repeat(10 - formData.difficulty)}
-          </p>
+          >
+            {DIFFICULTY_LEVELS.map((level) => (
+              <option key={level} value={level}>
+                {level}
+              </option>
+            ))}
+          </select>
+          <div className="mt-2">
+            <span className={`inline-block px-3 py-1 rounded-md border font-semibold text-sm ${getDifficultyColor(formData.difficulty)}`}>
+              {formData.difficulty}
+            </span>
+          </div>
         </div>
 
         <div>

@@ -6,6 +6,7 @@ import { z } from 'zod'
 const PatchJobSchema = z.object({
   title: z.string().min(1, 'Title is required').max(200).optional(),
   description: z.string().min(1, 'Description is required').optional(),
+  location: z.string().max(200).optional().nullable(),
   difficulty: z.number().int().min(1).max(20).optional(),
   reward: z.string().max(500).optional().nullable(),
   status: z.enum(['active', 'completed', 'archived']).optional(),
